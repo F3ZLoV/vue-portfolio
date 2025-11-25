@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { useWindowScroll } from '@vueuse/core'
 import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
@@ -191,6 +191,21 @@ watch(y, (newY) => {
   }
 })
 
+// 스크롤 진행률 계산
+const scrollProgress = computed(() => {
+  // SSR이나 초기 렌더링 시 document가 없을 경우 방어
+  if (typeof document === 'undefined' || typeof window === 'undefined') {
+    return '0%'
+  }
+
+  // 전체 스크롤 가능 높이 = 문서 전체 높이 - 창 높이
+  const height = document.body.offsetHeight - window.innerHeight
+  if (height <= 0) return '0%'
+
+  // 현재 스크롤 위치(y.value)를 퍼센트로 변환
+  return (y.value / height) * 100 + '%'
+})
+
 // --- PDF 내보내기 ---
 const handleExportPdf = async () => {
   isExporting.value = true
@@ -263,7 +278,8 @@ const prevScreenshot = () => {
     <div ref="portfolioRef" class="min-h-screen bg-background text-foreground font-sans transition-colors duration-300">
 
       <!-- Scroll Progress Bar -->
-      <div class="fixed top-0 left-0 h-1 bg-primary z-50 transition-[width]" :style="{ width: (y / (document.body.offsetHeight - window.innerHeight)) * 100 + '%' }"></div>
+      <div class="fixed top-0 left-0 h-1 bg-primary z-50 transition-[width]"
+           :style="{ width: scrollProgress }"></div>
 
       <!-- Loading Screen -->
       <div v-if="isLoading" class="fixed inset-0 bg-background flex items-center justify-center z-50 transition-opacity duration-500">
