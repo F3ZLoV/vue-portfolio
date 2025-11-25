@@ -25,11 +25,19 @@ const basePath = import.meta.env.BASE_URL
 
 import profileImage from './assets/images/profile.jpg'
 import lostarkImage from './assets/images/lostark1.png'
+import lostarkImage2 from './assets/images/lostarkImage2.jpg'
 import emrImage from './assets/images/EMR.png'
+import emrImage2 from './assets/images/EMR2.jpg'
+import emrImage3 from './assets/images/EMR3.jpg'
+import emrImage4 from './assets/images/EMR4.jpg'
 import commuImage from './assets/images/commu.png'
 import bankImage from './assets/images/bank_account.png'
 import hamterImage from './assets/images/hamter.png'
 import notionImage from './assets/images/notion.png'
+import cicImage1 from './assets/images/CICIoT2023_1.png'
+import cicImage2 from './assets/images/CICIoT2023_2.png'
+import cicImage3 from './assets/images/CICIoT2023_3.png'
+import f1ProjectImage from './assets/images/f1mr1.png'
 
 // --- 상태 관리 ---
 const isDark = ref(false)
@@ -57,6 +65,61 @@ const navItems = ['home', 'about', 'projects', 'contact']
 // --- 프로젝트 데이터 ---
 const projects = [
   {
+    title: "CICIoT2023 데이터셋 기반 IoT 공격 탐지",
+    description: "CICIoT2023 데이터셋을 기반으로 머신러닝 모델을 학습시켜 공격 트래픽 종류를 분류하는 모델 생성",
+    tech: ["Python 3.11", "sklearn", "Pandas", "Numpy"],
+    image: cicImage1,
+    github: "https://github.com/F3ZLoV/Term_Project_CICIoT2023_ML",
+    notion: "",
+    details: {
+      overview: "105개 실제 IoT 기기에 대한 최신 공격을 실행한 데이터 CICIoT2023 데이터셋을 기반으로 33종의 공격을 분류하는 ML 모델 생성",
+      features: [
+        "2, 8, 34-Class 분류로 그룹을 나누어 분류 모델 성능 테스트",
+        "XGBoost와 LightGBM 부스팅 모델의 성능 비교 및 향상 테스트"
+      ],
+      techStack: ["Python 3.11", "sklearn", "Pandas", "Numpy"],
+      troubleshooting: [
+        {
+          problem: "대용량 데이터셋(수십 GB) 로드시 메모리 부족(OOM) 현상 발생",
+          solution: "Pandas의 chunksize 옵션을 활용해 데이터를 분할 로드하고, 데이터 타입을 최적화(float64 -> float32)하여 메모리 사용량을 효율적으로 관리함."
+        },
+        {
+          problem: "DDoS 데이터 과밀집으로 인한 소수 클래스(Web, BruteForce) 탐지율 저조",
+          solution: "클래스 불균형 해소를 위해 SMOTE 오버샘플링 기법을 적용하고, 모델 학습 시 scale_pos_weight 파라미터를 조정하여 소수 클래스의 가중치를 높임."
+        }
+      ],
+      screenshots: [cicImage1, cicImage2, cicImage3]
+    }
+  },
+  {
+    title: "F1 레이싱 텔레메트리 데이터 파이프라인 구축",
+    description: "FastF1 API를 활용해 2018-2026년 F1 레이스 데이터(랩 타임, 텔레메트리, 날씨)를 수집하고 MongoDB에 적재하는 ETL 파이프라인 개발",
+    tech: ["Python", "MongoDB", "Pandas", "FastF1"],
+    image: f1ProjectImage,
+    github: "https://github.com/F3ZLoV/BigDataProject_Formula1_Telemetry",
+    notion: "",
+    details: {
+      overview: "F1 레이싱의 초정밀 데이터 분석을 위해 FastF1 라이브러리를 사용하여 연도별 전 경기 데이터를 수집합니다. 랩 타임, 섹터 기록뿐만 아니라 초당 수십 회 발생하는 차량 텔레메트리(속도, RPM, 기어, 스로틀 등)를 MongoDB에 구조화하여 저장하는 백엔드 데이터 파이프라인입니다.",
+      features: [
+        "Smart Recovery Mode: 수집 중단 시 처음부터 다시 하지 않고, 메타데이터와 텔레메트리 데이터 유무를 확인해 누락된 세션만 선별 수집",
+        "MongoDB 인덱싱 최적화: 연도/라운드/세션/드라이버 복합 인덱스를 적용하여 대용량 데이터 조회 속도 보장",
+        "API 호출 안정성 확보: 랜덤 쿨다운(Sleep) 및 오류 발생 시 자동 재시도/로그 기록 시스템 구축"
+      ],
+      techStack: ["Python 3.11", "MongoDB", "FastF1", "Pandas", "NumPy"],
+      troubleshooting: [
+        {
+          problem: "API 데이터 구조가 다른 '프리시즌 테스팅(Round 0)' 이벤트 호출 시 파이프라인 셧다운 발생",
+          solution: "정규 시즌 데이터만 분석하기 위해 루프 진입 시 RoundNumber가 0인 경우를 감지하여 즉시 continue 처리하는 예외 처리를 추가, 전체 수집 프로세스의 연속성을 확보함."
+        },
+        {
+          problem: "수십만 건의 텔레메트리 데이터 적재 중 네트워크 불안정으로 인한 부분 데이터 저장 문제",
+          solution: "단순히 데이터 존재 여부만 체크하는 것이 아니라, 텔레메트리 데이터 개수(Count > 100)를 확인하여 데이터가 불완전하게 저장된 세션은 자동으로 재수집하도록 로직을 개선함."
+        }
+      ],
+      screenshots: [f1ProjectImage]
+    }
+  },
+  {
     title: "로스트아크 레이드 숙제 관리 페이지",
     description: "국내 MMORPG 로스트아크 API 활용 캐릭터/레이드 매칭 관리 서비스",
     tech: ["JSP/Servlet", "HTML", "Bootstrap", "MySQL"],
@@ -73,11 +136,15 @@ const projects = [
       techStack: ["Java 11", "JSP & Servlet", "MySQL 8.0", "Bootstrap 5"],
       troubleshooting: [
         {
-          problem: "API 호출 횟수 제한으로 인한 데이터 로딩 지연",
-          solution: "자주 변하지 않는 캐릭터 기본 정보는 세션 스토리지 및 DB에 캐싱하여 API 호출을 최소화함."
+          problem: "주간 숙제 초기화 스케줄러(WeeklyRaidResetTask)가 서버 재시작 시 누락되는 문제",
+          solution: "서버 구동 시점(init)에 DB에 기록된 마지막 초기화 시간을 조회하고, 수요일 오전 6시가 지났다면 즉시 리셋 로직을 수행하도록 보정하여 스케줄러 안정성을 확보함."
+        },
+        {
+          problem: "다수의 캐릭터 숙제 목록 조회 시 발생하는 N+1 쿼리 문제로 인한 로딩 지연",
+          solution: "기존에 캐릭터별로 반복해서 숙제 테이블을 조회하던 로직을, SQL Join을 활용하여 한 번의 쿼리로 모든 캐릭터의 숙제 정보를 매핑해서 가져오도록 DAO 구조를 개선함."
         }
       ],
-      screenshots: [lostarkImage]
+      screenshots: [lostarkImage, lostarkImage2]
     }
   },
   {
@@ -97,11 +164,15 @@ const projects = [
       techStack: ["Java 17", "Spring Boot 3.0", "Spring Data JPA", "MySQL"],
       troubleshooting: [
         {
-          problem: "환자 데이터 증가에 따른 검색 속도 저하 우려",
-          solution: "자주 조회되는 컬럼에 인덱스를 적용하고, Fetch Join을 사용하여 쿼리 성능을 최적화함."
+          problem: "환자 진료 이력 목록 조회 시 연관된 엔티티(진단, 처방) 로딩으로 인한 N+1 쿼리 성능 저하",
+          solution: "단순 조회(findAll) 대신 JPQL의 'JOIN FETCH' 또는 @EntityGraph를 적용하여, 한 번의 쿼리로 환자와 연관된 진료 데이터를 즉시 로딩(Eager Loading)하도록 쿼리를 최적화함."
+        },
+        {
+          problem: "다량의 처방전 PDF 생성 및 다운로드 요청 시 서버 메모리 부족(OOM) 및 응답 지연 발생",
+          solution: "PDF 생성 로직(Flying Saucer)을 비동기 처리로 전환하고, 생성된 파일 스트림을 버퍼링하여 메모리 점유율을 낮추는 방식으로 리소스 관리를 개선함."
         }
       ],
-      screenshots: [emrImage]
+      screenshots: [emrImage, emrImage2, emrImage3, emrImage4]
     }
   },
   {
@@ -121,8 +192,12 @@ const projects = [
       techStack: ["Java", "JSP/Servlet", "MySQL", "AWS EC2"],
       troubleshooting: [
         {
-          problem: "파일 업로드 시 한글 파일명 깨짐 현상",
-          solution: "Tomcat 서버의 인코딩 설정을 변경하고 파일명 디코딩 로직을 수정하여 해결함."
+          problem: "AWS EC2 서버 재배포 시 기존에 업로드했던 이미지 파일들이 모두 삭제되는 현상",
+          solution: "파일 저장 경로를 프로젝트 내부(war)가 아닌 외부 절대 경로로 분리하고, Tomcat의 server.xml에서 <<Context>> 태그를 활용해 가상 경로(Virtual Path)를 매핑하여 해결함."
+        },
+        {
+          problem: "게시글 작성 및 DB 저장 시 한글 데이터가 물음표(???)로 깨지는 인코딩 문제",
+          solution: "JSP 상단의 setCharacterEncoding 설정뿐만 아니라, JDBC 연결 URL에 'useUnicode=true&characterEncoding=UTF-8' 옵션을 추가하여 DB 통신 구간의 인코딩을 통일함."
         }
       ],
       screenshots: [commuImage]
@@ -145,8 +220,8 @@ const projects = [
       techStack: ["Java SE", "Swing", "MySQL", "JDBC"],
       troubleshooting: [
         {
-          problem: "송금 도중 DB 오류 발생 시 돈이 증발하는 문제",
-          solution: "JDBC Connection의 setAutoCommit(false)를 설정하여 트랜잭션 처리를 구현함."
+          problem: "계좌 이체 도중 예외 발생 시, 송금자 잔액은 차감되었으나 수취인에게는 입금되지 않는 데이터 불일치(돈 증발) 위험 발견",
+          solution: "JDBC Connection의 setAutoCommit(false)를 설정하여 송금, 입금, 내역 저장을 하나의 트랜잭션으로 묶고, 예외 발생 시 전체 작업을 Rollback하도록 구현하여 데이터 무결성을 보장함."
         }
       ],
       screenshots: [bankImage]
@@ -379,7 +454,7 @@ const prevScreenshot = () => {
                   <div class="relative pl-4 border-l-2 border-muted-foreground/20">
                     <div class="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-muted-foreground"></div>
                     <h3 class="font-bold text-base">인하공업전문대학</h3>
-                    <p class="text-sm font-medium text-muted-foreground">컴퓨터정보과 (공학사)</p>
+                    <p class="text-sm font-medium text-muted-foreground">컴퓨터정보과 (공학사) (4년제 과정)</p>
                     <p class="text-xs text-muted-foreground">2026.03 ~ 2027.02 (예정)</p>
                   </div>
                 </div>
@@ -547,7 +622,7 @@ const prevScreenshot = () => {
       <section id="projects" :ref="sectionRefs.projects" class="py-24 px-4 bg-background">
         <div class="container mx-auto max-w-5xl">
           <div class="text-center mb-16">
-            <h2 class="text-4xl font-bold mb-4">PROJECTS</h2>
+            <h2 class="text-4xl font-bold mb-4">Projects</h2>
             <div class="w-20 h-1.5 bg-primary mx-auto rounded-full"></div>
           </div>
 
@@ -603,7 +678,7 @@ const prevScreenshot = () => {
 
       <footer class="py-8 border-t border-border bg-background">
         <div class="container mx-auto text-center text-sm text-muted-foreground">
-          <p>© 2025 Park Tae-joon. Recreated with Vue.js & Tailwind CSS.</p>
+          <p>© 2025 Park Tae-joon. Created with Vue.js & Tailwind CSS.</p>
         </div>
       </footer>
 
