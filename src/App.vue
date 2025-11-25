@@ -21,14 +21,12 @@ import {
   ChevronRight
 } from 'lucide-vue-next'
 
-// --- 이미지 경로 설정 (public/images 폴더 기준) ---
-// public 폴더에 있는 이미지는 루트(/) 경로로 접근합니다.
+// --- 이미지 경로 설정 ---
 const profileImage = '/images/profile.jpg'
 const lostarkImage = '/images/lostark1.png'
 const emrImage = '/images/EMR.png'
 const commuImage = '/images/commu.png'
 const bankImage = '/images/bank_account.png'
-const hamterImage = '/images/hamter.png'
 const notionImage = '/images/notion.png'
 
 // --- 상태 관리 ---
@@ -171,8 +169,17 @@ const toggleTheme = () => {
   }
 }
 
-// --- 스크롤 감지 ---
+// --- 스크롤 감지 및 진행률 ---
 const { y } = useWindowScroll()
+
+const scrollProgress = computed(() => {
+  if (typeof document === 'undefined' || typeof window === 'undefined') {
+    return '0%'
+  }
+  const height = document.body.offsetHeight - window.innerHeight
+  if (height <= 0) return '0%'
+  return (y.value / height) * 100 + '%'
+})
 
 watch(y, (newY) => {
   const scrollPosition = newY + 150
@@ -191,22 +198,7 @@ watch(y, (newY) => {
   }
 })
 
-// 스크롤 진행률 계산
-const scrollProgress = computed(() => {
-  // SSR이나 초기 렌더링 시 document가 없을 경우 방어
-  if (typeof document === 'undefined' || typeof window === 'undefined') {
-    return '0%'
-  }
-
-  // 전체 스크롤 가능 높이 = 문서 전체 높이 - 창 높이
-  const height = document.body.offsetHeight - window.innerHeight
-  if (height <= 0) return '0%'
-
-  // 현재 스크롤 위치(y.value)를 퍼센트로 변환
-  return (y.value / height) * 100 + '%'
-})
-
-// --- PDF 내보내기 ---
+// --- PDF 내보내기 (새 탭 + 인쇄 창) ---
 const handleExportPdf = async () => {
   isExporting.value = true
   await new Promise((resolve) => setTimeout(resolve, 100))
@@ -224,9 +216,9 @@ const handleExportPdf = async () => {
       if (element) {
         const canvas = await html2canvas(element, {
           scale: 2,
-          useCORS: true,
+          useCORS: true, // CDN 이미지(스킬 아이콘) 로딩 허용
           logging: false,
-          backgroundColor: null
+          backgroundColor: isDark.value ? '#1e293b' : '#ffffff' // 다크모드 대응 배경색
         })
 
         const imgData = canvas.toDataURL('image/png')
@@ -237,7 +229,15 @@ const handleExportPdf = async () => {
         }
       }
     }
-    pdf.save('portfolio.pdf')
+
+    // 인쇄 자동 트리거 설정
+    pdf.autoPrint()
+
+    // PDF Blob 생성 및 새 탭 열기
+    const blob = pdf.output('blob')
+    const url = URL.createObjectURL(blob)
+    window.open(url, '_blank')
+
   } catch (error) {
     console.error('PDF Error:', error)
     alert('PDF 변환 중 오류가 발생했습니다.')
@@ -275,18 +275,14 @@ const prevScreenshot = () => {
 
 <template>
   <div :class="{ 'dark': isDark }">
-    <div ref="portfolioRef" class="min-h-screen bg-background text-foreground font-sans transition-colors duration-300">
+    <div ref="portfolioRef" class="min-h-screen bg-background text-foreground transition-colors duration-300">
 
-      <!-- Scroll Progress Bar -->
-      <div class="fixed top-0 left-0 h-1 bg-primary z-50 transition-[width]"
-           :style="{ width: scrollProgress }"></div>
+      <div class="fixed top-0 left-0 h-1 bg-primary z-50 transition-[width]" :style="{ width: scrollProgress }"></div>
 
-      <!-- Loading Screen -->
       <div v-if="isLoading" class="fixed inset-0 bg-background flex items-center justify-center z-50 transition-opacity duration-500">
         <Loader2 class="w-16 h-16 text-primary animate-spin" />
       </div>
 
-      <!-- Navigation -->
       <nav class="fixed top-0 w-full z-40 bg-background/80 backdrop-blur-md border-b border-border/40 shadow-sm">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
           <div class="text-xl font-bold text-primary">Tae-joon's Resume</div>
@@ -304,13 +300,20 @@ const prevScreenshot = () => {
               </a>
             </div>
 
-            <!-- Dark Mode -->
-            <button class="p-2 rounded-md hover:bg-accent transition-colors relative" @click="toggleTheme">
-              <Sun v-if="!isDark" class="h-5 w-5 transition-all opacity-100 rotate-0 scale-100 dark:opacity-0 dark:rotate-90 dark:scale-0" />
-              <Moon v-else class="h-5 w-5 absolute top-2 left-2 transition-all opacity-0 -rotate-90 scale-0 dark:opacity-100 dark:rotate-0 dark:scale-100" />
+            <button
+                class="w-9 h-9 relative flex items-center justify-center rounded-md hover:bg-accent transition-colors"
+                @click="toggleTheme"
+            >
+              <Sun
+                  class="w-5 h-5 absolute transition-all duration-300"
+                  :class="isDark ? 'opacity-0 rotate-90 scale-0' : 'opacity-100 rotate-0 scale-100'"
+              />
+              <Moon
+                  class="w-5 h-5 absolute transition-all duration-300"
+                  :class="isDark ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-0'"
+              />
             </button>
 
-            <!-- PDF Export -->
             <button
                 class="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90 disabled:opacity-50"
                 @click="handleExportPdf"
@@ -321,7 +324,6 @@ const prevScreenshot = () => {
               {{ isExporting ? "Generating..." : "Print / Save PDF" }}
             </button>
 
-            <!-- Mobile Menu -->
             <button class="md:hidden p-2" @click="isMenuOpen = !isMenuOpen">
               <X v-if="isMenuOpen" class="w-6 h-6" />
               <Menu v-else class="w-6 h-6" />
@@ -330,11 +332,9 @@ const prevScreenshot = () => {
         </div>
       </nav>
 
-      <!-- Home Section (Page 1) -->
       <section id="home" :ref="sectionRefs.home" class="pt-28 pb-16 flex justify-center px-4">
-        <div class="a4-page bg-background text-foreground p-12 flex flex-col gap-8 max-w-[794px] w-full min-h-[1123px] relative overflow-hidden mx-auto box-border shadow-lg rounded-sm border border-border/30">
+        <div class="a4-page bg-background text-foreground p-12 flex flex-col gap-8 max-w-[794px] w-full min-h-[1123px] relative overflow-hidden mx-auto box-border rounded-sm">
 
-          <!-- Header -->
           <div class="flex items-center justify-between border-b-2 border-foreground pb-6">
             <div class="space-y-2">
               <h1 class="text-5xl font-extrabold tracking-tight">박태준</h1>
@@ -351,7 +351,6 @@ const prevScreenshot = () => {
             </div>
           </div>
 
-          <!-- Profile -->
           <div>
             <h2 class="text-xl font-bold mb-2 uppercase border-l-4 border-foreground pl-3">Profile</h2>
             <p class="text-sm leading-relaxed text-muted-foreground text-justify">
@@ -359,9 +358,7 @@ const prevScreenshot = () => {
             </p>
           </div>
 
-          <!-- Two Columns -->
           <div class="grid grid-cols-2 gap-10 flex-grow">
-            <!-- Left -->
             <div class="space-y-8">
               <div>
                 <h2 class="text-xl font-bold mb-4 uppercase border-l-4 border-foreground pl-3">Education</h2>
@@ -413,48 +410,88 @@ const prevScreenshot = () => {
               </div>
             </div>
 
-            <!-- Right -->
             <div class="space-y-8">
               <div>
                 <h2 class="text-xl font-bold mb-4 uppercase border-l-4 border-foreground pl-3">Skills & Tools</h2>
                 <div class="space-y-5">
-                  <!-- Backend -->
                   <div>
                     <h3 class="text-sm font-bold text-muted-foreground mb-2">Backend</h3>
                     <div class="flex flex-wrap gap-2">
-                      <span class="px-2 py-1 rounded-full border text-xs font-semibold border-border flex items-center gap-1 text-foreground">Java <span class="text-green-600 font-bold">(상)</span></span>
-                      <span class="px-2 py-1 rounded-full border text-xs font-semibold border-border flex items-center gap-1 text-foreground">Spring Boot <span class="text-green-600 font-bold">(상)</span></span>
-                      <span class="px-2 py-1 rounded-full border text-xs font-semibold border-border flex items-center gap-1 text-foreground">Python <span class="text-blue-600 font-bold">(중)</span></span>
-                      <span class="px-2 py-1 rounded-full border text-xs font-semibold border-border flex items-center gap-1 text-foreground">C++ <span class="text-yellow-600 font-bold">(하)</span></span>
+                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" class="w-4 h-4"/>
+                        Java <span class="text-green-600 font-bold">(상)</span>
+                      </span>
+                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg" class="w-4 h-4"/>
+                        Spring Boot <span class="text-green-600 font-bold">(상)</span>
+                      </span>
+                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" class="w-4 h-4"/>
+                        Python <span class="text-blue-600 font-bold">(중)</span>
+                      </span>
+                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg" class="w-4 h-4"/>
+                        C++ <span class="text-yellow-600 font-bold">(하)</span>
+                      </span>
                     </div>
                   </div>
-                  <!-- Frontend -->
                   <div>
                     <h3 class="text-sm font-bold text-muted-foreground mb-2">Frontend</h3>
                     <div class="flex flex-wrap gap-2">
-                      <span class="px-2 py-1 rounded-full border text-xs font-semibold border-border flex items-center gap-1 text-foreground">React <span class="text-blue-600 font-bold">(중)</span></span>
-                      <span class="px-2 py-1 rounded-full border text-xs font-semibold border-border flex items-center gap-1 text-foreground">Next.js <span class="text-blue-600 font-bold">(중)</span></span>
-                      <span class="px-2 py-1 rounded-full border text-xs font-semibold border-border flex items-center gap-1 text-foreground">HTML5 <span class="text-blue-600 font-bold">(중)</span></span>
-                      <span class="px-2 py-1 rounded-full border text-xs font-semibold border-border flex items-center gap-1 text-foreground">CSS3 <span class="text-blue-600 font-bold">(중)</span></span>
+                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" class="w-4 h-4"/>
+                        React <span class="text-blue-600 font-bold">(중)</span>
+                      </span>
+                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" class="w-4 h-4 dark:invert"/>
+                        Next.js <span class="text-blue-600 font-bold">(중)</span>
+                      </span>
+                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" class="w-4 h-4"/>
+                        HTML5 <span class="text-blue-600 font-bold">(중)</span>
+                      </span>
+                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" class="w-4 h-4"/>
+                        CSS3 <span class="text-blue-600 font-bold">(중)</span>
+                      </span>
                     </div>
                   </div>
-                  <!-- DB -->
                   <div>
                     <h3 class="text-sm font-bold text-muted-foreground mb-2">Database</h3>
                     <div class="flex flex-wrap gap-2">
-                      <span class="px-2 py-1 rounded-full border text-xs font-semibold border-border flex items-center gap-1 text-foreground">MySQL <span class="text-green-600 font-bold">(상)</span></span>
-                      <span class="px-2 py-1 rounded-full border text-xs font-semibold border-border flex items-center gap-1 text-foreground">MariaDB <span class="text-green-600 font-bold">(상)</span></span>
-                      <span class="px-2 py-1 rounded-full border text-xs font-semibold border-border flex items-center gap-1 text-foreground">Oracle <span class="text-yellow-600 font-bold">(하)</span></span>
+                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" class="w-4 h-4"/>
+                        MySQL <span class="text-green-600 font-bold">(상)</span>
+                      </span>
+                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mariadb/mariadb-original.svg" class="w-4 h-4"/>
+                        MariaDB <span class="text-green-600 font-bold">(상)</span>
+                      </span>
+                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/oracle/oracle-original.svg" class="w-4 h-4"/>
+                        Oracle <span class="text-yellow-600 font-bold">(하)</span>
+                      </span>
                     </div>
                   </div>
-                  <!-- DevOps -->
                   <div>
                     <h3 class="text-sm font-bold text-muted-foreground mb-2">DevOps</h3>
                     <div class="flex flex-wrap gap-2">
-                      <span class="px-2 py-1 rounded-full border text-xs font-semibold border-border flex items-center gap-1 text-foreground">Git <span class="text-green-600 font-bold">(상)</span></span>
-                      <span class="px-2 py-1 rounded-full border text-xs font-semibold border-border flex items-center gap-1 text-foreground">GitHub <span class="text-green-600 font-bold">(상)</span></span>
-                      <span class="px-2 py-1 rounded-full border text-xs font-semibold border-border flex items-center gap-1 text-foreground">AWS <span class="text-blue-600 font-bold">(중)</span></span>
-                      <span class="px-2 py-1 rounded-full border text-xs font-semibold border-border flex items-center gap-1 text-foreground">Docker <span class="text-blue-600 font-bold">(중)</span></span>
+                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" class="w-4 h-4"/>
+                        Git <span class="text-green-600 font-bold">(상)</span>
+                      </span>
+                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" class="w-4 h-4 dark:invert"/>
+                        GitHub <span class="text-green-600 font-bold">(상)</span>
+                      </span>
+                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original-wordmark.svg" class="w-4 h-4"/>
+                        AWS <span class="text-blue-600 font-bold">(중)</span>
+                      </span>
+                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
+                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" class="w-4 h-4"/>
+                        Docker <span class="text-blue-600 font-bold">(중)</span>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -464,9 +501,8 @@ const prevScreenshot = () => {
         </div>
       </section>
 
-      <!-- About Section (Page 2) -->
       <section id="about" :ref="sectionRefs.about" class="py-16 flex justify-center px-4">
-        <div class="a4-page bg-background text-foreground p-12 flex flex-col gap-10 max-w-[794px] w-full min-h-[1123px] relative overflow-hidden mx-auto box-border shadow-lg rounded-sm border border-border/30">
+        <div class="a4-page bg-background text-foreground p-12 flex flex-col gap-10 max-w-[794px] w-full min-h-[1123px] relative overflow-hidden mx-auto box-border rounded-sm">
           <div class="border-b border-border pb-4">
             <h2 class="text-3xl font-bold">About Me</h2>
           </div>
@@ -506,11 +542,10 @@ const prevScreenshot = () => {
         </div>
       </section>
 
-      <!-- Projects Section -->
       <section id="projects" :ref="sectionRefs.projects" class="py-24 px-4 bg-background">
         <div class="container mx-auto max-w-5xl">
           <div class="text-center mb-16">
-            <h2 class="text-4xl font-bold mb-4">Projects</h2>
+            <h2 class="text-4xl font-bold mb-4">PROJECTS</h2>
             <div class="w-20 h-1.5 bg-primary mx-auto rounded-full"></div>
           </div>
 
@@ -545,7 +580,6 @@ const prevScreenshot = () => {
         </div>
       </section>
 
-      <!-- Contact Section -->
       <section id="contact" :ref="sectionRefs.contact" class="py-24 px-4 bg-secondary/50">
         <div class="container mx-auto text-center">
           <div class="mb-10">
@@ -565,24 +599,20 @@ const prevScreenshot = () => {
         </div>
       </section>
 
-      <!-- Footer -->
       <footer class="py-8 border-t border-border bg-background">
         <div class="container mx-auto text-center text-sm text-muted-foreground">
           <p>© 2025 Park Tae-joon. Recreated with Vue.js & Tailwind CSS.</p>
         </div>
       </footer>
 
-      <!-- Project Modal -->
       <Transition name="fade">
         <div v-if="isModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80" @click.self="closeModal">
           <div class="bg-background w-full max-w-4xl h-[90vh] rounded-lg overflow-hidden flex flex-col shadow-2xl relative animate-in zoom-in-95 duration-200">
 
-            <!-- Close Button -->
             <button class="absolute right-4 top-4 z-10 p-2 bg-background/50 rounded-full hover:bg-accent transition-colors" @click="closeModal">
               <X class="w-5 h-5" />
             </button>
 
-            <!-- Modal Content Scroll Area -->
             <div class="flex-1 overflow-y-auto p-6 md:p-8">
               <div class="mb-6">
                 <h2 class="text-3xl font-bold mb-2">{{ selectedProject.title }}</h2>
@@ -598,17 +628,14 @@ const prevScreenshot = () => {
               </div>
 
               <div class="space-y-10">
-                <!-- Image Carousel -->
                 <div class="w-full bg-muted/30 rounded-lg p-4 relative group">
                   <div class="relative aspect-video w-full rounded-lg overflow-hidden border border-border">
-                    <!-- Current Image Logic -->
                     <img
                         :src="currentScreenshotIndex === 0 ? selectedProject.image : selectedProject.details.screenshots[currentScreenshotIndex - 1]"
                         class="w-full h-full object-contain bg-black"
                     />
                   </div>
 
-                  <!-- Navigation Buttons -->
                   <button @click="prevScreenshot" class="absolute left-6 top-1/2 -translate-y-1/2 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors">
                     <ChevronLeft class="w-6 h-6" />
                   </button>
@@ -616,7 +643,6 @@ const prevScreenshot = () => {
                     <ChevronRight class="w-6 h-6" />
                   </button>
 
-                  <!-- Indicators -->
                   <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
                     <div
                         v-for="i in (selectedProject.details.screenshots.length + 1)"
@@ -627,13 +653,11 @@ const prevScreenshot = () => {
                   </div>
                 </div>
 
-                <!-- Overview -->
                 <div>
                   <h3 class="text-xl font-bold mb-3 border-l-4 border-primary pl-3">프로젝트 개요</h3>
                   <p class="leading-7 text-muted-foreground">{{ selectedProject.details.overview }}</p>
                 </div>
 
-                <!-- Key Features -->
                 <div>
                   <h3 class="text-xl font-bold mb-3 border-l-4 border-primary pl-3">주요 기능</h3>
                   <ul class="list-disc list-inside space-y-2 text-muted-foreground">
@@ -643,7 +667,6 @@ const prevScreenshot = () => {
                   </ul>
                 </div>
 
-                <!-- Tech Stack -->
                 <div>
                   <h3 class="text-xl font-bold mb-3 border-l-4 border-primary pl-3">기술 스택</h3>
                   <div class="flex flex-wrap gap-2">
@@ -653,7 +676,6 @@ const prevScreenshot = () => {
                   </div>
                 </div>
 
-                <!-- Troubleshooting -->
                 <div>
                   <h3 class="text-xl font-bold mb-4 border-l-4 border-primary pl-3">트러블 슈팅</h3>
                   <div class="space-y-6">
@@ -681,6 +703,20 @@ const prevScreenshot = () => {
 </template>
 
 <style>
+/* 나눔고딕 (Nanum Gothic) 폰트 import */
+@import url("https://fonts.googleapis.com/earlyaccess/nanumgothic.css");
+
+:root {
+  --font-sans: 'Nanum Gothic', -apple-system, BlinkMacSystemFont, system-ui, Roboto,
+  'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR',
+  'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-weight: 400;
+}
+
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.2s ease;
