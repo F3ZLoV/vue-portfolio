@@ -23,13 +23,13 @@ import {
 
 const basePath = import.meta.env.BASE_URL
 
-const profileImage = `${basePath}images/profile.jpg`
-const lostarkImage = `${basePath}images/lostark1.png`
-const emrImage = `${basePath}images/EMR.png`
-const commuImage = `${basePath}images/commu.png`
-const bankImage = `${basePath}images/bank_account.png`
-const hamterImage = `${basePath}images/hamter.png`
-const notionImage = `${basePath}images/notion.png`
+import profileImage from './assets/images/profile.jpg'
+import lostarkImage from './assets/images/lostark1.png'
+import emrImage from './assets/images/EMR.png'
+import commuImage from './assets/images/commu.png'
+import bankImage from './assets/images/bank_account.png'
+import hamterImage from './assets/images/hamter.png'
+import notionImage from './assets/images/notion.png'
 
 // --- 상태 관리 ---
 const isDark = ref(false)
