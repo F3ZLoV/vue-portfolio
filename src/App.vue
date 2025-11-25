@@ -21,13 +21,15 @@ import {
   ChevronRight
 } from 'lucide-vue-next'
 
-// --- 이미지 경로 설정 ---
-const profileImage = '/images/profile.jpg'
-const lostarkImage = '/images/lostark1.png'
-const emrImage = '/images/EMR.png'
-const commuImage = '/images/commu.png'
-const bankImage = '/images/bank_account.png'
-const notionImage = '/images/notion.png'
+const basePath = import.meta.env.BASE_URL
+
+const profileImage = `${basePath}images/profile.jpg`
+const lostarkImage = `${basePath}images/lostark1.png`
+const emrImage = `${basePath}images/EMR.png`
+const commuImage = `${basePath}images/commu.png`
+const bankImage = `${basePath}images/bank_account.png`
+const hamterImage = `${basePath}images/hamter.png`
+const notionImage = `${basePath}images/notion.png`
 
 // --- 상태 관리 ---
 const isDark = ref(false)
