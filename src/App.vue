@@ -284,21 +284,28 @@ const handleExportPdf = async () => {
     const pdf = new jsPDF('p', 'mm', 'a4')
     const pdfWidth = pdf.internal.pageSize.getWidth()
     const pdfHeight = pdf.internal.pageSize.getHeight()
-    const targetSections = ['home', 'about']
+
+    const targetSections = ['home', 'about', 'projects']
 
     for (let i = 0; i < targetSections.length; i++) {
       const sectionKey = targetSections[i]
-      const element = sectionRefs[sectionKey].value?.querySelector('.a4-page')
+      const sectionRef = sectionRefs[sectionKey].value
+
+      let element = sectionRef?.querySelector('.a4-page')
+      if (!element && sectionKey === 'projects') {
+        element = sectionRef?.querySelector('.container')
+      }
 
       if (element) {
         const canvas = await html2canvas(element, {
           scale: 2,
-          useCORS: true, // CDN 이미지(스킬 아이콘) 로딩 허용
+          useCORS: true,
           logging: false,
-          backgroundColor: isDark.value ? '#1e293b' : '#ffffff' // 다크모드 대응 배경색
+          backgroundColor: isDark.value ? '#1e293b' : '#ffffff'
         })
 
         const imgData = canvas.toDataURL('image/png')
+
         pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
 
         if (i < targetSections.length - 1) {
@@ -307,10 +314,7 @@ const handleExportPdf = async () => {
       }
     }
 
-    // 인쇄 자동 트리거 설정
     pdf.autoPrint()
-
-    // PDF Blob 생성 및 새 탭 열기
     const blob = pdf.output('blob')
     const url = URL.createObjectURL(blob)
     window.open(url, '_blank')
