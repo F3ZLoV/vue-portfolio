@@ -38,6 +38,24 @@ import cicImage1 from './assets/images/CICIoT2023_1.png'
 import cicImage2 from './assets/images/CICIoT2023_2.png'
 import cicImage3 from './assets/images/CICIoT2023_3.png'
 import f1ProjectImage from './assets/images/f1mr1.png'
+import smartstudyImage from './assets/images/smartstudy_main.png'
+import smartstudyImage2 from './assets/images/smartstudy_ai.png'
+import smartstudyImage3 from './assets/images/smartstudy_architecture.png'
+import smartstudyImage4 from './assets/images/smartstudy_erd.png'
+import smartstudyImage5 from './assets/images/smartstudy_google_login.png'
+
+import javaIcon from './assets/icons/java-original.png'
+import springIcon from './assets/icons/spring-original.png'
+import pythonIcon from './assets/icons/python-original.png'
+import html5Icon from './assets/icons/html5-original.png'
+import css3Icon from './assets/icons/css3-original.png'
+import mysqlIcon from './assets/icons/mysql-original.png'
+import oracleIcon from './assets/icons/oracle-original.png'
+import gitIcon from './assets/icons/git-original.png'
+import githubIcon from './assets/icons/github-original.png'
+import awsIcon from './assets/icons/amazonwebservices-original-wordmark.png'
+import dockerIcon from './assets/icons/docker-original.png'
+import k8sIcon from './assets/icons/kubernetes-plain.png'
 
 // --- 상태 관리 ---
 const isDark = ref(false)
@@ -64,6 +82,121 @@ const navItems = ['home', 'about', 'projects', 'contact']
 
 // --- 프로젝트 데이터 ---
 const projects = [
+  {
+    featured: true,
+    title: "Smart Study Messenger — AWS 서버리스 실시간 메신저",
+    description: "Discord 스타일의 학습 협업 메신저. AWS Lambda 35개 + DynamoDB 7테이블 + SQS 비동기 큐 + Bedrock AI 분석 기반 서버리스 풀스택 프로젝트",
+    tech: ["AWS Lambda", "API Gateway", "DynamoDB", "SQS", "Bedrock", "React"],
+    image: smartstudyImage,
+    github: "https://github.com/jeonghyeonme/CloudService",
+    notion: "https://befitting-shark-cf5.notion.site/3-2e00f81ea81080aeaaa9c59610c336e9?pvs=74",
+    details: {
+      overview: "5인 팀 프로젝트의 백엔드 인프라 리드 담당. AWS Lambda 35개, REST/WebSocket API Gateway, DynamoDB 7테이블, SQS 비동기 큐, Bedrock Claude 3 Haiku 기반 AI 자료 분석 파이프라인을 단독으로 설계 및 배포함. 학부 IAM 제약(CloudFormation/IAM Role 생성 불가) 환경에서 Serverless Framework 같은 IaC 도구 없이 AWS CloudShell + bash 스크립트로 수동 cli 배포 파이프라인을 직접 구축하며 클라우드 인프라 운영을 깊이 경험함.",
+      features: [
+        "AWS Lambda 35개 + REST/WebSocket API Gateway + DynamoDB 7테이블 서버리스 아키텍처 단독 설계 및 배포",
+        "WebSocket 기반 실시간 채팅 + 입력 중 알림(typing) + 프로필 변경 실시간 동기화(profileChanged) 구현",
+        "Bedrock Claude 3 Haiku 멀티모달 API로 PDF/이미지 AI 자료 분석 파이프라인 구축 (스캔 PDF는 mupdf로 이미지 변환 후 처리)",
+        "자체 JWT 인증 시스템 구축 (bcrypt + Refresh Token 멀티 디바이스 지원) + Google OAuth 통합 (id_token 검증 방식, Cognito 없이)",
+        "SQS 비동기 큐로 채팅 메시지 버퍼링 + AI 분석 작업 처리 → API Gateway 30초 타임아웃 우회",
+        "DynamoDB Conditional Write로 중복 AI 분석 방지 (멱등성 보장) + Connections 테이블 serverId-index GSI로 효율적 브로드캐스트"
+      ],
+      techStack: [
+        "AWS Lambda (Node.js 20)",
+        "API Gateway (REST + WebSocket)",
+        "DynamoDB + GSI 설계",
+        "Amazon SQS",
+        "Amazon Bedrock (Claude 3 Haiku)",
+        "Amazon Rekognition + Translate",
+        "Amazon S3 (Pre-signed URL)",
+        "React + WebSocket",
+        "google-auth-library (Google OAuth)"
+      ],
+      troubleshooting: [
+        {
+          problem: "스캔된 PDF는 텍스트 레이어가 없어 Bedrock Converse API의 document 블록으로 입력 시 NO_TEXT_LAYER 에러 발생 (한국 대학 교재 대부분이 스캔본)",
+          solution: "mupdf 라이브러리로 PDF 첫 5페이지를 2배 해상도 PNG 이미지로 변환 후 Bedrock의 멀티모달 image 블록으로 입력하는 폴백 흐름을 구축. mupdf가 ESM 전용 + top-level await을 사용해서 Lambda(CommonJS 환경)에서는 require()로 import 불가능했고, await import('mupdf')로 동적 import 처리해서 해결함."
+        },
+        {
+          problem: "다수의 동시 사용자가 같은 파일을 분석 요청 시 Bedrock 호출 비용이 폭증할 위험 + 동일 작업 중복 실행 문제",
+          solution: "DynamoDB Conditional Write로 멱등성 락 구현. Messages 테이블에 'serverId=AI_DEDUP_LOCK, messageId=<s3ObjectKey>' 특수 키로 attribute_not_exists 조건의 PUT을 시도해 이미 분석 중인 파일에 대한 중복 요청을 차단. TTL로 5분 후 자동 만료되어 재분석 가능하도록 설계함."
+        },
+        {
+          problem: "학부 IAM 환경에서 CloudFormation, IAM Role 생성, Access Key 발급이 모두 차단되어 Serverless Framework/SAM 등 IaC 도구를 사용 불가",
+          solution: "AWS CloudShell + bash 스크립트(deploy.sh, setup-api.sh)로 수동 cli 배포 파이프라인을 직접 구축. zip → S3 업로드 → update-function-code 흐름을 자동화하고, 신규 Lambda 추가 시 발생하는 권한 함정(get-function이 AccessDenied 반환 → 분기 깨짐)을 수동 create-function으로 우회하는 표준 절차를 수립함."
+        },
+        {
+          problem: "프로필(닉네임/이미지) 변경 시 같은 서버 접속자들의 채팅창에 옛 닉네임이 그대로 표시되는 동기화 문제",
+          solution: "Backend updateMe Lambda에서 ServerMembers Query → 각 서버별 Connections 테이블의 serverId-index GSI 조회 → 모든 활성 connection에 'profileChanged' 액션 브로드캐스트하는 로직 추가. Frontend는 useMemo로 members 배열을 O(1) lookup memberMap으로 변환해 메시지 렌더링 시 최신 닉네임/이미지를 동적 매핑. 탈퇴/추방된 멤버는 메시지 저장 시점 값으로 자연스럽게 fallback 처리."
+        },
+        {
+          problem: "Textract로 한국어 PDF 분석 시 OCR 품질이 떨어지고 영문 위주 학습 모델로 한자 섞인 학술 자료 인식률 저조",
+          solution: "Textract를 제거하고 Bedrock Converse API의 document 블록으로 PDF 바이너리를 직접 전달하는 방식으로 전환. 중간 인코딩 변환 단계가 사라져 한글 깨짐 문제도 자동 해결됐고, 기존 2단계 파이프라인(텍스트 추출 → 요약)을 1단계로 통합하여 비용과 응답 시간을 모두 개선함."
+        },
+        {
+          problem: "Google OAuth 통합 시 자체 JWT 인증 구조 전체를 Cognito로 마이그레이션하는 대신 기존 구조 유지 방법 모색",
+          solution: "Cognito 도입 시 35개 Lambda의 토큰 검증 로직 전체를 변경해야 하는 부담을 피하기 위해 id_token 검증 방식을 채택. google-auth-library의 verifyIdToken으로 Google 공개키 기반 서명 검증 + audience 클레임 확인을 거쳐 Client Secret 없이 안전하게 통합. 신규 Lambda 1개만 추가하고 기존 JWT 발급 흐름(createAccessToken/saveRefreshToken)을 그대로 활용해 마이그레이션 비용을 최소화함."
+        }
+      ],
+      screenshots: [smartstudyImage, smartstudyImage2, smartstudyImage3, smartstudyImage4, smartstudyImage5]
+    }
+  },
+  // {
+  //   featured: true,
+  //   title: "ML 기반 Kubernetes 사전 오토스케일링 — KSCI 논문",
+  //   description: "LSTM·GRU·Ensemble 모델과 HPA를 7개 트래픽 시나리오 × 84 run으로 비교 평가. KEDA External Metrics API 연동, 자체 개발한 Lead Time 측정 도구, 'No Universal Winner' 명제 실증",
+  //   tech: ["Kubernetes", "KEDA", "TensorFlow", "FastAPI", "LSTM/GRU", "Prometheus"],
+  //   image: ksciPaperImage, // ← 대표 이미지 import 필요 (히트맵이나 시스템 아키텍처 다이어그램 추천)
+  //   github: "https://github.com/F3ZLoV/ML-based-Kubernetes-Pre-AutoScaling",
+  //   notion: "", // 노션 링크 있으면 추가
+  //   details: {
+  //     overview: "졸업논문 외 KSCI(한국컴퓨터정보학회) 저널 투고 논문. ML 기반 사전 오토스케일링을 Kubernetes 표준 HPA와 비교 평가하기 위해, DigitalOcean Kubernetes Service(DOKS) 클러스터에서 KEDA External Metrics API를 통해 LSTM, GRU, Ensemble 모델을 HPA와 동시 비교하는 시스템을 단독으로 설계·구축·운영함. 7개 트래픽 시나리오(SPIKE, STATIONARY, RAMP, PERIODIC archetype) × 4개 모델 × 3회 반복 = 84개 실험을 수행하여 912건의 스케일링 이벤트와 5종 운영 메트릭을 수집·분석함. 핵심 명제 'No Universal Winner — archetype-aware autoscaling needed'를 실측 데이터로 실증.",
+  //     features: [
+  //       "KEDA External Metrics API로 ML 추론 서버(FastAPI + TensorFlow)를 외부 메트릭 소스로 등록하여 LSTM/GRU/Ensemble 예측값이 직접 HPA 목표 파드 수가 되도록 통합",
+  //       "Kubernetes Watch API 기반 자체 도구(lead_time_tracker)로 스케일 명령 발행부터 파드 Ready 도달까지의 운영적 지연(Lead Time)을 실시간 측정 — 기존 문헌이 정확도 지표(RMSE/MAPE)에 집중함으로써 놓친 운영 메트릭을 정량화",
+  //       "Alibaba Cluster Trace 2018(72시간, 10초 단위) 공개 데이터셋으로 LSTM/GRU/Ensemble 모델 학습(look_back=60, 3-feature, Adam+MSE, Colab T4 GPU)",
+  //       "7개 트래픽 시나리오(AWS spike, Alibaba spike/periodic/wiki + 합성 SPIKE/STEP/RAMP) 설계 — Wikipedia Pageview API 실측 데이터, Locust custom LoadShape로 부하 재현",
+  //       "엄격한 초기 상태 통제 프로토콜 도입(wait_for_pods_settle 함수, 120초 cooldown, AI 서버 재시작) — 통제 여부에 따라 동일 archetype에서 결론이 반전될 수 있음을 실증",
+  //       "Safety Guard 2단계 설계: 규칙 기반 하한선 max(1, ⌊user_count/20⌋) + 상태 기반 폴백(last_known_traffic 유지)으로 OOD 입력·일시적 통신 장애에서 시스템 안정성 확보"
+  //     ],
+  //     techStack: [
+  //       "Kubernetes (DOKS, v1.31)",
+  //       "KEDA 2.16 (External Metrics API)",
+  //       "Python 3.12 + FastAPI 0.115",
+  //       "TensorFlow 2.16 (LSTM/GRU/Ensemble)",
+  //       "Prometheus + Grafana 모니터링",
+  //       "Locust 2.43 (custom LoadShape)",
+  //       "ngrok HTTPS Tunnel",
+  //       "Alibaba Cluster Trace 2018"
+  //     ],
+  //     troubleshooting: [
+  //       {
+  //         problem: "초기 실험(Preliminary Phase)에서 모든 ML 모델이 HPA보다 현저히 부진한 결과를 보였는데, 데이터 분석 결과 직전 실험의 스케일 다운이 완료되지 않은 상태에서 다음 실험이 시작되어 클러스터 초기 상태가 일관되게 통제되지 않은 것이 원인으로 파악됨",
+  //         solution: "wait_for_pods_settle() 함수를 도입해 Kubernetes API를 15초 간격으로 폴링하며 파드 수가 2개 이하로 수렴함을 검증한 후에만 다음 실험이 시작되도록 프로토콜을 강화함(최대 180초 대기, 미수렴 시 강제 재초기화). 환경 통제 후 GRU 모델이 HPA 대비 +15.1% 빠른 반응을 보여 동일 archetype에서 결론이 완전히 반전됨을 실증. 이는 ML 기반 오토스케일러 평가에서 초기 상태 통제가 결과 신뢰성의 전제 조건임을 보여주는 핵심 발견이 됨."
+  //       },
+  //       {
+  //         problem: "AI 추론 서버에 일시적 네트워크 장애가 발생하면 last_known_traffic이 0으로 리셋되어 KEDA가 파드를 1개로 축소시키는 무한 리셋 문제. 또한 OOD 입력(학습 분포 벗어난 트래픽)에 대해 모델이 비정상적으로 낮은 예측값을 반환하여 가용성이 깨지는 사례 발생",
+  //         solution: "Safety Guard 2단계 메커니즘 구축. 규칙 기반 하한선으로 max(1, ⌊user_count/20⌋) 최소 파드 수를 보장하여 AI 예측이 비정상적이어도 부하 테스트 결과 기반의 최소 가용성을 확보. 상태 기반 폴백으로 fetch_live_traffic 예외 시 last_known_traffic을 유지(0 리셋 X)하여 일시적 통신 실패에서도 시스템이 무한 리셋되지 않도록 처리. traffic_memory deque의 maxlen도 5에서 60(look_back과 일치)으로 수정하여 시계열 일관성 확보."
+  //       },
+  //       {
+  //         problem: "Ensemble 모델(LSTM+GRU 가중 평균)이 일부 런에서 1개 → 25개 → 1개 → 25개로 급격하게 replica를 변동시키는 oscillation 현상 발생. 단일 시점에 24개 파드를 추가했다가 즉시 제거하여 클러스터 자원 효율성 저하 및 운영 비용 폭증 위험",
+  //         solution: "원인 분석 결과 LSTM과 GRU의 예측이 상충할 때 가중 평균이 불안정하게 진동하는 것으로 파악됨. 이는 Zhang et al. AAPA 논문이 이론적으로 지적한 replica churn 문제의 실측 사례에 해당. 단순 가중 평균 결합이 아닌 변화율 제한(rate limiting)·히스테리시스(hysteresis) 등 안정화 메커니즘 동반의 필요성을 논문에 실무적 권고로 정리. 또한 학습 분포 변화 민감도 실험에서 Ensemble이 +81.7% 성능 저하로 분포 변화에 가장 취약한 결합 구조임을 추가 실증."
+  //       },
+  //       {
+  //         problem: "초기 학습 데이터셋(AWS Kaggle)로 학습한 모델을 Alibaba 시나리오에서 평가하니 train-test 분포 불일치로 Ensemble이 Lead Time 2.57초 → 4.67초로 +81.7% 악화. 공개 데이터셋만으로 학습한 모델이 실제 운영 환경에서 부진할 수 있다는 분포 민감도 문제 직면",
+  //         solution: "Alibaba Cluster Trace 2018 데이터셋으로 동일 모델 구조 재학습 후 양 데이터셋 결과를 직접 비교. AWS 학습 모델은 Ensemble이 1위지만 Alibaba 환경에서는 GRU가 가장 일관된 성능을 보이는 패턴 발견. scaler 파일도 aws_kaggle_scaler.pkl에서 alibaba_scaler.pkl로 교체하여 정규화 일관성 확보. 운영 환경에서는 공개 데이터셋만으로 학습하지 말고 실측 데이터 기반 주기적 재학습 파이프라인이 필수임을 논문 Discussion에서 실무적 권고로 도출."
+  //       },
+  //       {
+  //         problem: "KEDA ScaledObject와 기존 HPA 객체가 충돌하면서 ScaledObject READY=False 상태가 되고 이벤트 로그조차 남지 않는 문제 발생. 실험 자동화 스크립트가 중간에 멈춤",
+  //         solution: "원인을 추적한 결과 직전 실험의 HPA 객체가 제거되지 않은 채 새 ScaledObject를 적용해서 발생한 stale HPA 충돌로 파악. 실험 프로토콜에 'kubectl delete hpa --all -n default'를 ScaledObject 재적용 전에 반드시 실행하도록 명시. 또한 ngrok URL이 재시작마다 변경되는 문제도 keda-scaler.yaml을 매 실험마다 갱신하는 자동화 스크립트로 해결."
+  //       },
+  //       {
+  //         problem: "DigitalOcean 노드 풀을 doctl CLI로 0으로 축소(--count 0)하는 명령이 불안정하게 동작하여 노드가 남아있는 채로 다음 실험이 시작되는 사례 발생",
+  //         solution: "DigitalOcean 대시보드에서 수동으로 노드 풀을 0 ↔ 3 사이에서 조작하는 표준 절차로 변경. CLI 자동화는 포기하더라도 실험 재현성과 신뢰성을 우선시. 실험 자동화 스크립트는 노드 풀 조작은 사람이 하고, 그 외 HPA 삭제 → replica=2 리셋 → keda-scaler 재적용 → lead_time_tracker 시작 흐름을 자동화하는 형태로 분리 설계함."
+  //       }
+  //     ],
+  //     screenshots: [ksciPaperImage] // 추가 스크린샷이 있다면 배열로 추가
+  //   }
+  // },
   {
     title: "CICIoT2023 데이터셋 기반 IoT 공격 탐지",
     description: "CICIoT2023 데이터셋을 기반으로 머신러닝 모델을 학습시켜 공격 트래픽 종류를 분류하는 모델 생성",
@@ -275,6 +408,15 @@ watch(y, (newY) => {
   }
 })
 
+const waitForImages = (element) =>
+  Promise.all(
+    Array.from(element.querySelectorAll('img')).map((img) =>
+      img.complete && img.naturalHeight !== 0
+        ? Promise.resolve()
+        : new Promise((res) => { img.onload = img.onerror = res })
+    )
+  )
+
 // --- PDF 내보내기 (새 탭 + 인쇄 창) ---
 const handleExportPdf = async () => {
   isExporting.value = true
@@ -297,9 +439,11 @@ const handleExportPdf = async () => {
       }
 
       if (element) {
+        await waitForImages(element)
         const canvas = await html2canvas(element, {
           scale: 2,
           useCORS: true,
+          imageTimeout: 15000,
           logging: false,
           backgroundColor: isDark.value ? '#1e293b' : '#ffffff'
         })
@@ -343,13 +487,13 @@ const closeModal = () => {
 
 const nextScreenshot = () => {
   if (!selectedProject.value) return
-  const total = selectedProject.value.details.screenshots.length + 1
+  const total = selectedProject.value.details.screenshots.length
   currentScreenshotIndex.value = (currentScreenshotIndex.value + 1) % total
 }
 
 const prevScreenshot = () => {
   if (!selectedProject.value) return
-  const total = selectedProject.value.details.screenshots.length + 1
+  const total = selectedProject.value.details.screenshots.length
   currentScreenshotIndex.value = (currentScreenshotIndex.value - 1 + total) % total
 }
 </script>
@@ -427,9 +571,12 @@ const prevScreenshot = () => {
                 <div class="flex items-center gap-2"><MapPin class="w-3 h-3"/> 인천시 서구</div>
               </div>
             </div>
-            <div class="w-40 h-40 rounded-full overflow-hidden border-4 border-muted shadow-inner relative">
-              <img :src="profileImage" alt="Profile" class="object-cover w-full h-full" />
-            </div>
+            <div
+              class="w-40 h-40 rounded-full overflow-hidden border-4 border-muted shadow-inner relative bg-cover bg-center flex-shrink-0"
+              :style="{ backgroundImage: `url(${profileImage})` }"
+              role="img"
+              aria-label="Profile"
+            ></div>
           </div>
 
           <div>
@@ -463,32 +610,6 @@ const prevScreenshot = () => {
                   </div>
                 </div>
               </div>
-
-              <div>
-                <h2 class="text-xl font-bold mb-4 uppercase border-l-4 border-foreground pl-3">Certification</h2>
-                <div class="space-y-3 text-sm border-t border-border pt-2 text-muted-foreground">
-                  <div class="flex justify-between border-b border-border pb-1">
-                    <span class="font-semibold text-foreground">SQLD</span>
-                    <span>2025.08</span>
-                  </div>
-                  <div class="flex justify-between border-b border-border pb-1">
-                    <span class="font-semibold text-foreground">정보처리산업기사</span>
-                    <span>2025.12</span>
-                  </div>
-                  <div class="flex justify-between border-b border-border pb-1">
-                    <span class="font-semibold text-muted-foreground line-through">리눅스 마스터 2급</span>
-                    <span class="line-through opacity-50">2026.03</span>
-                  </div>
-                  <div class="flex justify-between border-b border-border pb-1">
-                    <span class="font-semibold text-muted-foreground line-through">AWS Cloud Practitioner</span>
-                    <span class="line-through opacity-50">2026.04</span>
-                  </div>
-                  <div class="flex justify-between border-b border-border pb-1">
-                    <span class="font-semibold text-muted-foreground line-through">AWS Solution Associate</span>
-                    <span class="line-through opacity-50">2026.08</span>
-                  </div>
-                </div>
-              </div>
             </div>
 
             <div class="space-y-8">
@@ -498,80 +619,56 @@ const prevScreenshot = () => {
                   <div>
                     <h3 class="text-sm font-bold text-muted-foreground mb-2">Backend</h3>
                     <div class="flex flex-wrap gap-2">
-                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
-                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" class="w-4 h-4"/>
-                        Java <span class="text-green-600 font-bold">(상)</span>
+                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
+                        <img :src="javaIcon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">Java <span class="text-green-600 font-bold">(상)</span></span>
                       </span>
-                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
-                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg" class="w-4 h-4"/>
-                        Spring Boot <span class="text-green-600 font-bold">(상)</span>
+                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
+                        <img :src="springIcon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">Spring Boot <span class="text-blue-600 font-bold">(중)</span></span>
                       </span>
-                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
-                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" class="w-4 h-4"/>
-                        Python <span class="text-blue-600 font-bold">(중)</span>
-                      </span>
-                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
-                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg" class="w-4 h-4"/>
-                        C++ <span class="text-yellow-600 font-bold">(하)</span>
+                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
+                        <img :src="pythonIcon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">Python <span class="text-blue-600 font-bold">(중)</span></span>
                       </span>
                     </div>
                   </div>
                   <div>
                     <h3 class="text-sm font-bold text-muted-foreground mb-2">Frontend</h3>
                     <div class="flex flex-wrap gap-2">
-                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
-                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" class="w-4 h-4"/>
-                        React <span class="text-blue-600 font-bold">(중)</span>
+                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
+                        <img :src="html5Icon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">HTML5 <span class="text-blue-600 font-bold">(중)</span></span>
                       </span>
-                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
-                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" class="w-4 h-4 dark:invert"/>
-                        Next.js <span class="text-blue-600 font-bold">(중)</span>
-                      </span>
-                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
-                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" class="w-4 h-4"/>
-                        HTML5 <span class="text-blue-600 font-bold">(중)</span>
-                      </span>
-                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
-                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" class="w-4 h-4"/>
-                        CSS3 <span class="text-blue-600 font-bold">(중)</span>
+                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
+                        <img :src="css3Icon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">CSS3 <span class="text-blue-600 font-bold">(중)</span></span>
                       </span>
                     </div>
                   </div>
                   <div>
                     <h3 class="text-sm font-bold text-muted-foreground mb-2">Database</h3>
                     <div class="flex flex-wrap gap-2">
-                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
-                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" class="w-4 h-4"/>
-                        MySQL <span class="text-green-600 font-bold">(상)</span>
+                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
+                        <img :src="mysqlIcon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">MySQL <span class="text-green-600 font-bold">(상)</span></span>
                       </span>
-                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
-                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mariadb/mariadb-original.svg" class="w-4 h-4"/>
-                        MariaDB <span class="text-green-600 font-bold">(상)</span>
-                      </span>
-                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
-                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/oracle/oracle-original.svg" class="w-4 h-4"/>
-                        Oracle <span class="text-yellow-600 font-bold">(하)</span>
+                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
+                        <img :src="oracleIcon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">Oracle <span class="text-yellow-600 font-bold">(하)</span></span>
                       </span>
                     </div>
                   </div>
                   <div>
                     <h3 class="text-sm font-bold text-muted-foreground mb-2">DevOps</h3>
                     <div class="flex flex-wrap gap-2">
-                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
-                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" class="w-4 h-4"/>
-                        Git <span class="text-green-600 font-bold">(상)</span>
+                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
+                        <img :src="gitIcon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">Git <span class="text-green-600 font-bold">(상)</span></span>
                       </span>
-                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
-                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" class="w-4 h-4 dark:invert"/>
-                        GitHub <span class="text-green-600 font-bold">(상)</span>
+                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
+                        <img :src="githubIcon" class="w-4 h-4 inline-block align-middle mr-1.5 dark:invert"/><span class="align-middle">GitHub <span class="text-green-600 font-bold">(상)</span></span>
                       </span>
-                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
-                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original-wordmark.svg" class="w-4 h-4"/>
-                        AWS <span class="text-blue-600 font-bold">(중)</span>
+                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
+                        <img :src="awsIcon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">AWS <span class="text-blue-600 font-bold">(중)</span></span>
                       </span>
-                      <span class="px-3 py-1.5 rounded-full border text-xs font-semibold border-border flex items-center gap-2 text-foreground">
-                        <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" class="w-4 h-4"/>
-                        Docker <span class="text-blue-600 font-bold">(중)</span>
+                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
+                        <img :src="dockerIcon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">Docker <span class="text-blue-600 font-bold">(중)</span></span>
+                      </span>
+                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
+                        <img :src="k8sIcon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">Kubernetes <span class="text-yellow-600 font-bold">(하)</span></span>
                       </span>
                     </div>
                   </div>
@@ -594,8 +691,7 @@ const prevScreenshot = () => {
               나의 여정
             </h3>
             <p class="text-sm leading-7 text-muted-foreground text-justify">
-              저는 컴퓨터라곤 게임을 위한 도구로 밖에 모르던 고등학교 2학년 때, 친구와 함께 호기심으로 참가한 UNIST 슈퍼컴퓨팅 청소년 캠프를 통해 인생의 터닝포인트를 맞이했습니다. 4박 5일간의 짧은 시간이었지만 수준 높은 실습과 특강을 통해 처음으로 프로그래밍이라는 세계에 매료되었고, '내가 만드는 코드가 직접 동작한다'는 경험에 큰 흥미를 느꼈습니다. <br/><br/>
-              당시에는 막연한 흥미였지만, 진로를 고민하던 시기에 그때의 강렬한 경험이 떠올라 주저 없이 컴퓨터공학 전공을 선택하였습니다. 대학에서는 컴퓨터 구조, 운영체제, 네트워크 등 전공 이론과 함께 다양한 팀/개인 프로젝트를 진행하며 실력을 쌓았고, 문서 작성과 협업 경험을 통해 문제 해결 중심의 사고 방식과 실무 역량을 키워나갔습니다.
+              저는 '모르는 것을 두려워하지 않는 개발자'가 되고 싶습니다. 3학년 때 Spring 경험이 전무한 상태에서 병원 EMR 시스템 개발에 도전해, 강의와 공식 문서를 참고하며 Spring Boot를 독학했습니다. 그 결과 DB 연동부터 예약·진료 이력 관리까지 갖춘 시스템을 완성했고, '개발은 문제를 해결해나가는 과정'임을 깊이 체감했습니다.
             </p>
           </div>
 
@@ -605,8 +701,7 @@ const prevScreenshot = () => {
               기술과 도전
             </h3>
             <p class="text-sm leading-7 text-muted-foreground text-justify">
-              저는 '모르는 것을 두려워하지 않는 개발자'가 되고 싶습니다. 3학년 1학기에 병원 EMR 시스템 개발을 개인 프로젝트로 진행하려 할 때, Java 스킬만 다져놓은 상태였고 Spring에 대해서는 전무했습니다. 그러나 병원 업무 시스템을 제대로 구현하기 위해서는 백엔드 프레임워크가 필수적이라고 판단했고, 결국 Spring Boot의 기본부터 하나하나 독학해가며 시스템을 직접 구축하는 도전을 선택했습니다. <br/><br/>
-              처음에는 REST API 설계조차 생소했지만, 관련 강의와 공식 문서를 참고해가며 기초를 다지고 작은 기능부터 직접 구현했습니다. 결과적으로 데이터베이스 연동부터 병원 예약 처리, 진료 이력 관리 등 하나의 완성된 시스템을 만들어 낼 수 있었고, 이 과정에서 '개발은 문제를 해결해나가는 과정'이라는 사실을 깊이 체감했습니다.
+              대학에서 쌓은 경험은 개발자로서의 토대가 되었지만, 동시에 배워야 할 것이 많다는 것도 깨달았습니다. 앞으로는 현장에서 직접 부딪히며 실전 경험을 쌓고, 실패를 두려워하지 않고 시행착오 속에서 단단하게 성장하는 개발자가 되겠습니다.
             </p>
           </div>
 
@@ -635,6 +730,7 @@ const prevScreenshot = () => {
                 v-for="(project, index) in projects"
                 :key="index"
                 class="group cursor-pointer"
+                :class="{ 'md:col-span-2': project.featured }"
                 @click="openModal(project)"
             >
               <div class="h-full flex flex-col bg-card border border-border/50 rounded-lg hover:shadow-lg transition-all duration-300 hover:scale-[1.02] overflow-hidden">
@@ -712,7 +808,7 @@ const prevScreenshot = () => {
                 <div class="w-full bg-muted/30 rounded-lg p-4 relative group">
                   <div class="relative aspect-video w-full rounded-lg overflow-hidden border border-border">
                     <img
-                        :src="currentScreenshotIndex === 0 ? selectedProject.image : selectedProject.details.screenshots[currentScreenshotIndex - 1]"
+                        :src="selectedProject.details.screenshots[currentScreenshotIndex]"
                         class="w-full h-full object-contain bg-black"
                     />
                   </div>
@@ -726,7 +822,7 @@ const prevScreenshot = () => {
 
                   <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
                     <div
-                        v-for="i in (selectedProject.details.screenshots.length + 1)"
+                        v-for="i in (selectedProject.details.screenshots.length)"
                         :key="i"
                         class="w-2 h-2 rounded-full transition-colors"
                         :class="(i-1) === currentScreenshotIndex ? 'bg-white' : 'bg-white/50'"
