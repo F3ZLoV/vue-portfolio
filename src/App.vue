@@ -43,6 +43,11 @@ import smartstudyImage2 from './assets/images/smartstudy_ai.png'
 import smartstudyImage3 from './assets/images/smartstudy_architecture.png'
 import smartstudyImage4 from './assets/images/smartstudy_erd.png'
 import smartstudyImage5 from './assets/images/smartstudy_google_login.png'
+import ksciImage1 from './assets/images/fig1.png'
+import ksciImage2 from './assets/images/fig2.png'
+import ksciImage3 from './assets/images/fig4.png'
+import ksciImage4 from './assets/images/fig7.png'
+import ksciImage5 from './assets/images/fig8.png'
 
 import javaIcon from './assets/icons/java-original.png'
 import springIcon from './assets/icons/spring-original.png'
@@ -140,63 +145,59 @@ const projects = [
       screenshots: [smartstudyImage, smartstudyImage2, smartstudyImage3, smartstudyImage4, smartstudyImage5]
     }
   },
-  // {
-  //   featured: true,
-  //   title: "ML 기반 Kubernetes 사전 오토스케일링 — KSCI 논문",
-  //   description: "LSTM·GRU·Ensemble 모델과 HPA를 7개 트래픽 시나리오 × 84 run으로 비교 평가. KEDA External Metrics API 연동, 자체 개발한 Lead Time 측정 도구, 'No Universal Winner' 명제 실증",
-  //   tech: ["Kubernetes", "KEDA", "TensorFlow", "FastAPI", "LSTM/GRU", "Prometheus"],
-  //   image: ksciPaperImage, // ← 대표 이미지 import 필요 (히트맵이나 시스템 아키텍처 다이어그램 추천)
-  //   github: "https://github.com/F3ZLoV/ML-based-Kubernetes-Pre-AutoScaling",
-  //   notion: "", // 노션 링크 있으면 추가
-  //   details: {
-  //     overview: "졸업논문 외 KSCI(한국컴퓨터정보학회) 저널 투고 논문. ML 기반 사전 오토스케일링을 Kubernetes 표준 HPA와 비교 평가하기 위해, DigitalOcean Kubernetes Service(DOKS) 클러스터에서 KEDA External Metrics API를 통해 LSTM, GRU, Ensemble 모델을 HPA와 동시 비교하는 시스템을 단독으로 설계·구축·운영함. 7개 트래픽 시나리오(SPIKE, STATIONARY, RAMP, PERIODIC archetype) × 4개 모델 × 3회 반복 = 84개 실험을 수행하여 912건의 스케일링 이벤트와 5종 운영 메트릭을 수집·분석함. 핵심 명제 'No Universal Winner — archetype-aware autoscaling needed'를 실측 데이터로 실증.",
-  //     features: [
-  //       "KEDA External Metrics API로 ML 추론 서버(FastAPI + TensorFlow)를 외부 메트릭 소스로 등록하여 LSTM/GRU/Ensemble 예측값이 직접 HPA 목표 파드 수가 되도록 통합",
-  //       "Kubernetes Watch API 기반 자체 도구(lead_time_tracker)로 스케일 명령 발행부터 파드 Ready 도달까지의 운영적 지연(Lead Time)을 실시간 측정 — 기존 문헌이 정확도 지표(RMSE/MAPE)에 집중함으로써 놓친 운영 메트릭을 정량화",
-  //       "Alibaba Cluster Trace 2018(72시간, 10초 단위) 공개 데이터셋으로 LSTM/GRU/Ensemble 모델 학습(look_back=60, 3-feature, Adam+MSE, Colab T4 GPU)",
-  //       "7개 트래픽 시나리오(AWS spike, Alibaba spike/periodic/wiki + 합성 SPIKE/STEP/RAMP) 설계 — Wikipedia Pageview API 실측 데이터, Locust custom LoadShape로 부하 재현",
-  //       "엄격한 초기 상태 통제 프로토콜 도입(wait_for_pods_settle 함수, 120초 cooldown, AI 서버 재시작) — 통제 여부에 따라 동일 archetype에서 결론이 반전될 수 있음을 실증",
-  //       "Safety Guard 2단계 설계: 규칙 기반 하한선 max(1, ⌊user_count/20⌋) + 상태 기반 폴백(last_known_traffic 유지)으로 OOD 입력·일시적 통신 장애에서 시스템 안정성 확보"
-  //     ],
-  //     techStack: [
-  //       "Kubernetes (DOKS, v1.31)",
-  //       "KEDA 2.16 (External Metrics API)",
-  //       "Python 3.12 + FastAPI 0.115",
-  //       "TensorFlow 2.16 (LSTM/GRU/Ensemble)",
-  //       "Prometheus + Grafana 모니터링",
-  //       "Locust 2.43 (custom LoadShape)",
-  //       "ngrok HTTPS Tunnel",
-  //       "Alibaba Cluster Trace 2018"
-  //     ],
-  //     troubleshooting: [
-  //       {
-  //         problem: "초기 실험(Preliminary Phase)에서 모든 ML 모델이 HPA보다 현저히 부진한 결과를 보였는데, 데이터 분석 결과 직전 실험의 스케일 다운이 완료되지 않은 상태에서 다음 실험이 시작되어 클러스터 초기 상태가 일관되게 통제되지 않은 것이 원인으로 파악됨",
-  //         solution: "wait_for_pods_settle() 함수를 도입해 Kubernetes API를 15초 간격으로 폴링하며 파드 수가 2개 이하로 수렴함을 검증한 후에만 다음 실험이 시작되도록 프로토콜을 강화함(최대 180초 대기, 미수렴 시 강제 재초기화). 환경 통제 후 GRU 모델이 HPA 대비 +15.1% 빠른 반응을 보여 동일 archetype에서 결론이 완전히 반전됨을 실증. 이는 ML 기반 오토스케일러 평가에서 초기 상태 통제가 결과 신뢰성의 전제 조건임을 보여주는 핵심 발견이 됨."
-  //       },
-  //       {
-  //         problem: "AI 추론 서버에 일시적 네트워크 장애가 발생하면 last_known_traffic이 0으로 리셋되어 KEDA가 파드를 1개로 축소시키는 무한 리셋 문제. 또한 OOD 입력(학습 분포 벗어난 트래픽)에 대해 모델이 비정상적으로 낮은 예측값을 반환하여 가용성이 깨지는 사례 발생",
-  //         solution: "Safety Guard 2단계 메커니즘 구축. 규칙 기반 하한선으로 max(1, ⌊user_count/20⌋) 최소 파드 수를 보장하여 AI 예측이 비정상적이어도 부하 테스트 결과 기반의 최소 가용성을 확보. 상태 기반 폴백으로 fetch_live_traffic 예외 시 last_known_traffic을 유지(0 리셋 X)하여 일시적 통신 실패에서도 시스템이 무한 리셋되지 않도록 처리. traffic_memory deque의 maxlen도 5에서 60(look_back과 일치)으로 수정하여 시계열 일관성 확보."
-  //       },
-  //       {
-  //         problem: "Ensemble 모델(LSTM+GRU 가중 평균)이 일부 런에서 1개 → 25개 → 1개 → 25개로 급격하게 replica를 변동시키는 oscillation 현상 발생. 단일 시점에 24개 파드를 추가했다가 즉시 제거하여 클러스터 자원 효율성 저하 및 운영 비용 폭증 위험",
-  //         solution: "원인 분석 결과 LSTM과 GRU의 예측이 상충할 때 가중 평균이 불안정하게 진동하는 것으로 파악됨. 이는 Zhang et al. AAPA 논문이 이론적으로 지적한 replica churn 문제의 실측 사례에 해당. 단순 가중 평균 결합이 아닌 변화율 제한(rate limiting)·히스테리시스(hysteresis) 등 안정화 메커니즘 동반의 필요성을 논문에 실무적 권고로 정리. 또한 학습 분포 변화 민감도 실험에서 Ensemble이 +81.7% 성능 저하로 분포 변화에 가장 취약한 결합 구조임을 추가 실증."
-  //       },
-  //       {
-  //         problem: "초기 학습 데이터셋(AWS Kaggle)로 학습한 모델을 Alibaba 시나리오에서 평가하니 train-test 분포 불일치로 Ensemble이 Lead Time 2.57초 → 4.67초로 +81.7% 악화. 공개 데이터셋만으로 학습한 모델이 실제 운영 환경에서 부진할 수 있다는 분포 민감도 문제 직면",
-  //         solution: "Alibaba Cluster Trace 2018 데이터셋으로 동일 모델 구조 재학습 후 양 데이터셋 결과를 직접 비교. AWS 학습 모델은 Ensemble이 1위지만 Alibaba 환경에서는 GRU가 가장 일관된 성능을 보이는 패턴 발견. scaler 파일도 aws_kaggle_scaler.pkl에서 alibaba_scaler.pkl로 교체하여 정규화 일관성 확보. 운영 환경에서는 공개 데이터셋만으로 학습하지 말고 실측 데이터 기반 주기적 재학습 파이프라인이 필수임을 논문 Discussion에서 실무적 권고로 도출."
-  //       },
-  //       {
-  //         problem: "KEDA ScaledObject와 기존 HPA 객체가 충돌하면서 ScaledObject READY=False 상태가 되고 이벤트 로그조차 남지 않는 문제 발생. 실험 자동화 스크립트가 중간에 멈춤",
-  //         solution: "원인을 추적한 결과 직전 실험의 HPA 객체가 제거되지 않은 채 새 ScaledObject를 적용해서 발생한 stale HPA 충돌로 파악. 실험 프로토콜에 'kubectl delete hpa --all -n default'를 ScaledObject 재적용 전에 반드시 실행하도록 명시. 또한 ngrok URL이 재시작마다 변경되는 문제도 keda-scaler.yaml을 매 실험마다 갱신하는 자동화 스크립트로 해결."
-  //       },
-  //       {
-  //         problem: "DigitalOcean 노드 풀을 doctl CLI로 0으로 축소(--count 0)하는 명령이 불안정하게 동작하여 노드가 남아있는 채로 다음 실험이 시작되는 사례 발생",
-  //         solution: "DigitalOcean 대시보드에서 수동으로 노드 풀을 0 ↔ 3 사이에서 조작하는 표준 절차로 변경. CLI 자동화는 포기하더라도 실험 재현성과 신뢰성을 우선시. 실험 자동화 스크립트는 노드 풀 조작은 사람이 하고, 그 외 HPA 삭제 → replica=2 리셋 → keda-scaler 재적용 → lead_time_tracker 시작 흐름을 자동화하는 형태로 분리 설계함."
-  //       }
-  //     ],
-  //     screenshots: [ksciPaperImage] // 추가 스크린샷이 있다면 배열로 추가
-  //   }
-  // },
+{
+    featured: true,
+    title: "ML 기반 Kubernetes 사전 오토스케일링 — 트래픽 Archetype별 예측 스케일러 평가",
+    description: "KSCI(한국컴퓨터정보학회) 투고 · 학사 학위 논문 · 단독 연구·구현. LSTM·GRU·Ensemble과 HPA를 7개 트래픽 시나리오 × 84 run으로 비교 평가하고, 자체 개발한 Lead Time 측정 도구로 'No Universal Winner' 명제를 실증",
+    tech: ["Kubernetes", "KEDA", "TensorFlow", "FastAPI", "LSTM/GRU", "Prometheus"],
+    image: ksciImage1,
+    github: "https://github.com/F3ZLoV/ML-based-Kubernetes-Pre-AutoScaling/tree/dev",
+    notion: "",
+    details: {
+      overview: "Kubernetes 기본 오토스케일러 HPA의 사후 대응(reactive) 구조가 유발하는 cold start 지연을, ML 트래픽 예측 기반의 선제적(proactive) 스케일 아웃으로 해결·검증한 실증 연구. DigitalOcean Kubernetes(DOKS) 환경에서 KEDA External Metrics API로 LSTM·GRU·Ensemble 예측값을 스케일링 트리거로 연동하고, HPA와 함께 4개 트래픽 archetype(SPIKE·STATIONARY·RAMP·PERIODIC)을 포함한 7개 시나리오에서 총 84회(912 스케일링 이벤트)를 실측 비교. 특히 '스케일 명령 발행 → 새 파드 Ready 도달'까지의 리드 타임을 직접 측정하는 도구를 자체 개발해, 기존 연구가 놓친 운영 지표를 정량화. 결과적으로 단일 모델이 모든 패턴에서 우월하지 않다는 'No Universal Winner' 명제를 실측으로 도출(HPA 4승 / GRU 2승 / Ensemble 1승 / LSTM 0승)하고, GRU가 RAMP 시나리오에서 HPA 대비 리드 타임 15.1%·P95 지연 25.9% 개선을 달성함을 확인.",
+      features: [
+        "KEDA External Metrics API(metrics-api 트리거, targetValue=1)로 ML 추론 서버 예측값(predicted_replicas)을 스케일링 결정 입력으로 직접 연동",
+        "Kubernetes Watch API 기반 리드 타임 측정 도구 자체 개발 (scale-out 명령 → pod condition.Ready 전환 시각 차이를 이벤트별 계측, CSV 로깅)",
+        "7 시나리오 × 4 스케일러 × 3회 = 84 run 자동화 실험 파이프라인, 912건 스케일링 이벤트 분석 (리드타임·P95/P99·에러율·Time-to-Peak·Aggressiveness 5종 지표)",
+        "실 트래픽 재현: AWS CloudWatch · Alibaba Cluster Trace 2018 · Wikimedia Pageview API를 Locust custom LoadShape로 리샘플링해 부하 발생",
+        "2단계 Safety Guard: 규칙 기반 하한선 max(1, ⌊user_count/20⌋) + 통신 실패 시 last_known_traffic 폴백으로 무한 리셋 방지",
+        "Alibaba Cluster Trace 2018로 LSTM/GRU 재학습(Colab T4), 60-step look-back window · 3-feature(user_count/rps/response_time) · MinMaxScaler 정규화",
+        "ngrok HTTPS 터널로 로컬 FastAPI 추론 서버를 클러스터 External Metrics 소스로 노출"
+      ],
+      techStack: [
+        "Kubernetes (DOKS)",
+        "KEDA (External Metrics)",
+        "HPA",
+        "Prometheus + Grafana",
+        "Locust (custom LoadShape)",
+        "FastAPI + Uvicorn",
+        "TensorFlow 2.16 (LSTM/GRU/Ensemble)",
+        "Python 3.12",
+        "Kubernetes Watch API",
+        "ngrok",
+        "Alibaba Cluster Trace 2018"
+      ],
+      troubleshooting: [
+        {
+          problem: "초기 실험에서 모든 ML 모델이 HPA보다 리드 타임이 느리게 측정돼 'ML 오토스케일링은 실효성이 없다'는 잘못된 결론에 도달할 뻔함.",
+          solution: "각 run 시작 시점의 클러스터 초기 상태(직전 실험의 미완료 스케일 다운으로 잔존한 파드)가 통제되지 않은 게 원인임을 데이터 분석으로 규명. 초기 상태 통제 프로토콜(kubectl delete hpa --all → replicas 리셋 → ScaledObject 재적용)을 도입하자 동일 archetype에서 결론이 반전 — GRU가 HPA 대비 리드 타임 15.1% 단축. ML 오토스케일러 평가에서 초기 상태 통제가 결과 신뢰성의 전제 조건임을 실증."
+        },
+        {
+          problem: "AWS 데이터로 학습한 모델을 Alibaba 트래픽에 적용하자 Ensemble의 리드 타임이 2.57s → 4.67s(+81.7%)로 급락. 단순 가중 평균 결합이 분포 변화에 가장 취약했음.",
+          solution: "LSTM·GRU 두 base 모델이 새 분포에 서로 다른 방향으로 적응할 때 그 차이가 가중 평균에서 증폭됨을 진단. Alibaba Cluster Trace 2018로 전면 재학습하고, 공개 데이터셋 단독 학습의 한계를 근거로 운영 데이터 기반 주기적 재학습 파이프라인의 필요성을 도출."
+        },
+        {
+          problem: "Periodic 트래픽에서 Ensemble이 짧은 시간에 1개 → 25개 → 1개로 급진동(Δ≥20 대형 점프 11회)하며 replica churn 발생 → 클러스터 자원·비용 낭비.",
+          solution: "LSTM·GRU 예측이 상충할 때 가중 평균이 불안정하게 진동하는 것이 원인임을 시계열 분석으로 규명(GRU는 동일 조건 0회, bounded). 단순 평균 결합에는 변화율 제한(rate limiting)·hysteresis 등 안정화 메커니즘이 필수임을 제시."
+        },
+        {
+          problem: "기존 연구는 예측 정확도(RMSE/MAPE)만 평가해, 실제 운영 이득을 측정하지 못함. 실제로 LSTM은 Time-to-Peak가 가장 빨랐으나(57.6s) P95 지연은 8,000ms로 최악 — 확장 속도와 사용자 체감 성능이 비례하지 않음.",
+          solution: "'scale-out 명령 → pod Ready'를 직접 계측하는 리드 타임 도구를 자체 개발하고, P95/P99 지연·에러율까지 5종 운영 메트릭으로 평가축을 재정의해 정확도-운영성능 간 단절을 실측으로 드러냄."
+        }
+      ],
+      screenshots: [ksciImage1, ksciImage2, ksciImage3, ksciImage4, ksciImage5]
+    }
+  },
   {
     title: "CICIoT2023 데이터셋 기반 IoT 공격 탐지",
     description: "CICIoT2023 데이터셋을 기반으로 머신러닝 모델을 학습시켜 공격 트래픽 종류를 분류하는 모델 생성",
