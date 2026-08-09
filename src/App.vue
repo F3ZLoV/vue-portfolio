@@ -23,7 +23,7 @@ import {
 
 const basePath = import.meta.env.BASE_URL
 
-import profileImage from './assets/images/profile.jpg'
+import profileImage from './assets/images/profile.png'
 import lostarkImage from './assets/images/lostark1.png'
 import lostarkImage2 from './assets/images/lostarkImage2.jpg'
 import emrImage from './assets/images/EMR.png'
@@ -607,6 +607,18 @@ const prevScreenshot = () => {
                     <h3 class="font-bold text-base">인하공업전문대학</h3>
                     <p class="text-sm font-medium text-muted-foreground">컴퓨터정보과 (공학사) (4년제 과정)</p>
                     <p class="text-xs text-muted-foreground">2026.03 ~ 2027.02 (예정)</p>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h2 class="text-xl font-bold mb-4 uppercase border-l-4 border-foreground pl-3">Certification</h2>
+                <div class="space-y-3 text-sm border-t border-border pt-2 text-muted-foreground">
+                  <div class="flex justify-between border-b border-border pb-1">
+                    <span>
+                      <span class="font-semibold text-foreground">정보처리기사</span>
+                      <span class="text-xs text-muted-foreground/60 ml-1.5">한국산업인력공단</span>
+                    </span>
+                    <span>2026.09</span>
                   </div>
                 </div>
               </div>
