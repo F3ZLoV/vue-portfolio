@@ -24,14 +24,11 @@ import {
 const basePath = import.meta.env.BASE_URL
 
 import profileImage from './assets/images/profile.png'
-import lostarkImage from './assets/images/lostark1.png'
-import lostarkImage2 from './assets/images/lostarkImage2.jpg'
 import emrImage from './assets/images/EMR.png'
 import emrImage2 from './assets/images/EMR2.jpg'
 import emrImage3 from './assets/images/EMR3.jpg'
 import emrImage4 from './assets/images/EMR4.jpg'
 import commuImage from './assets/images/commu.png'
-import bankImage from './assets/images/bank_account.png'
 import hamterImage from './assets/images/hamter.png'
 import notionImage from './assets/images/notion.png'
 import cicImage1 from './assets/images/CICIoT2023_1.png'
@@ -145,7 +142,7 @@ const projects = [
       screenshots: [smartstudyImage, smartstudyImage2, smartstudyImage3, smartstudyImage4, smartstudyImage5]
     }
   },
-{
+  {
     featured: true,
     title: "ML 기반 Kubernetes 사전 오토스케일링 — 트래픽 Archetype별 예측 스케일러 평가",
     description: "KSCI(한국컴퓨터정보학회) 투고 · 학사 학위 논문 · 단독 연구·구현. LSTM·GRU·Ensemble과 HPA를 7개 트래픽 시나리오 × 84 run으로 비교 평가하고, 자체 개발한 Lead Time 측정 도구로 'No Universal Winner' 명제를 실증",
@@ -199,89 +196,6 @@ const projects = [
     }
   },
   {
-    title: "CICIoT2023 데이터셋 기반 IoT 공격 탐지",
-    description: "CICIoT2023 데이터셋을 기반으로 머신러닝 모델을 학습시켜 공격 트래픽 종류를 분류하는 모델 생성",
-    tech: ["Python 3.11", "sklearn", "Pandas", "Numpy"],
-    image: cicImage1,
-    github: "https://github.com/F3ZLoV/Term_Project_CICIoT2023_ML",
-    notion: "",
-    details: {
-      overview: "105개 실제 IoT 기기에 대한 최신 공격을 실행한 데이터 CICIoT2023 데이터셋을 기반으로 33종의 공격을 분류하는 ML 모델 생성",
-      features: [
-        "2, 8, 34-Class 분류로 그룹을 나누어 분류 모델 성능 테스트",
-        "XGBoost와 LightGBM 부스팅 모델의 성능 비교 및 향상 테스트"
-      ],
-      techStack: ["Python 3.11", "sklearn", "Pandas", "Numpy"],
-      troubleshooting: [
-        {
-          problem: "대용량 데이터셋(수십 GB) 로드시 메모리 부족(OOM) 현상 발생",
-          solution: "Pandas의 chunksize 옵션을 활용해 데이터를 분할 로드하고, 데이터 타입을 최적화(float64 -> float32)하여 메모리 사용량을 효율적으로 관리함."
-        },
-        {
-          problem: "DDoS 데이터 과밀집으로 인한 소수 클래스(Web, BruteForce) 탐지율 저조",
-          solution: "클래스 불균형 해소를 위해 SMOTE 오버샘플링 기법을 적용하고, 모델 학습 시 scale_pos_weight 파라미터를 조정하여 소수 클래스의 가중치를 높임."
-        }
-      ],
-      screenshots: [cicImage1, cicImage2, cicImage3]
-    }
-  },
-  {
-    title: "F1 레이싱 텔레메트리 데이터 파이프라인 구축",
-    description: "FastF1 API를 활용해 2018-2026년 F1 레이스 데이터(랩 타임, 텔레메트리, 날씨)를 수집하고 MongoDB에 적재하는 ETL 파이프라인 개발",
-    tech: ["Python", "MongoDB", "Pandas", "FastF1"],
-    image: f1ProjectImage,
-    github: "https://github.com/F3ZLoV/BigDataProject_Formula1_Telemetry",
-    notion: "",
-    details: {
-      overview: "F1 레이싱의 초정밀 데이터 분석을 위해 FastF1 라이브러리를 사용하여 연도별 전 경기 데이터를 수집합니다. 랩 타임, 섹터 기록뿐만 아니라 초당 수십 회 발생하는 차량 텔레메트리(속도, RPM, 기어, 스로틀 등)를 MongoDB에 구조화하여 저장하는 백엔드 데이터 파이프라인입니다.",
-      features: [
-        "Smart Recovery Mode: 수집 중단 시 처음부터 다시 하지 않고, 메타데이터와 텔레메트리 데이터 유무를 확인해 누락된 세션만 선별 수집",
-        "MongoDB 인덱싱 최적화: 연도/라운드/세션/드라이버 복합 인덱스를 적용하여 대용량 데이터 조회 속도 보장",
-        "API 호출 안정성 확보: 랜덤 쿨다운(Sleep) 및 오류 발생 시 자동 재시도/로그 기록 시스템 구축"
-      ],
-      techStack: ["Python 3.11", "MongoDB", "FastF1", "Pandas", "NumPy"],
-      troubleshooting: [
-        {
-          problem: "API 데이터 구조가 다른 '프리시즌 테스팅(Round 0)' 이벤트 호출 시 파이프라인 셧다운 발생",
-          solution: "정규 시즌 데이터만 분석하기 위해 루프 진입 시 RoundNumber가 0인 경우를 감지하여 즉시 continue 처리하는 예외 처리를 추가, 전체 수집 프로세스의 연속성을 확보함."
-        },
-        {
-          problem: "수십만 건의 텔레메트리 데이터 적재 중 네트워크 불안정으로 인한 부분 데이터 저장 문제",
-          solution: "단순히 데이터 존재 여부만 체크하는 것이 아니라, 텔레메트리 데이터 개수(Count > 100)를 확인하여 데이터가 불완전하게 저장된 세션은 자동으로 재수집하도록 로직을 개선함."
-        }
-      ],
-      screenshots: [f1ProjectImage]
-    }
-  },
-  {
-    title: "로스트아크 레이드 숙제 관리 페이지",
-    description: "국내 MMORPG 로스트아크 API 활용 캐릭터/레이드 매칭 관리 서비스",
-    tech: ["JSP/Servlet", "HTML", "Bootstrap", "MySQL"],
-    image: lostarkImage,
-    github: "https://github.com/F3ZLoV/LostArkRaidManager",
-    notion: "https://www.notion.so/1e9a55bf89ae807b81e4d9b702e49169",
-    details: {
-      overview: "로스트아크 게임의 API를 활용하여 사용자의 캐릭터 정보를 불러오고, 주간/일일 숙제(레이드 등) 현황을 체크하며 관리할 수 있는 웹 서비스입니다.",
-      features: [
-        "로스트아크 Open API 연동을 통한 캐릭터 실시간 정보 조회",
-        "주간 레이드 및 일일 숙제 체크리스트 기능",
-        "반응형 웹 디자인 적용 (모바일/PC 지원)"
-      ],
-      techStack: ["Java 11", "JSP & Servlet", "MySQL 8.0", "Bootstrap 5"],
-      troubleshooting: [
-        {
-          problem: "주간 숙제 초기화 스케줄러(WeeklyRaidResetTask)가 서버 재시작 시 누락되는 문제",
-          solution: "서버 구동 시점(init)에 DB에 기록된 마지막 초기화 시간을 조회하고, 수요일 오전 6시가 지났다면 즉시 리셋 로직을 수행하도록 보정하여 스케줄러 안정성을 확보함."
-        },
-        {
-          problem: "다수의 캐릭터 숙제 목록 조회 시 발생하는 N+1 쿼리 문제로 인한 로딩 지연",
-          solution: "기존에 캐릭터별로 반복해서 숙제 테이블을 조회하던 로직을, SQL Join을 활용하여 한 번의 쿼리로 모든 캐릭터의 숙제 정보를 매핑해서 가져오도록 DAO 구조를 개선함."
-        }
-      ],
-      screenshots: [lostarkImage, lostarkImage2]
-    }
-  },
-  {
     title: "병원(이비인후과) EMR 프로젝트",
     description: "Spring Boot/JPA 기반 병원 진료/예약/데이터 관리 시스템 (EMR)",
     tech: ["Spring Boot", "Thymeleaf", "MySQL", "JPA"],
@@ -310,6 +224,62 @@ const projects = [
     }
   },
   {
+    title: "F1 레이싱 텔레메트리 데이터 파이프라인 구축",
+    description: "FastF1 API로 2018-2026년 F1 레이스 데이터(랩 타임, 텔레메트리, 날씨)를 수집·적재하는 ETL 파이프라인 → 현재 AWS(Kinesis·Firehose·S3 데이터레이크) 기반 실시간 파이프라인으로 재구축 중",
+    tech: ["Python", "MongoDB", "AWS Kinesis", "FastF1"],
+    image: f1ProjectImage,
+    github: "https://github.com/F3ZLoV/BigDataProject_Formula1_Telemetry",
+    notion: "",
+    details: {
+      overview: "F1 레이싱의 초정밀 데이터 분석을 위해 FastF1 라이브러리로 연도별 전 경기 데이터를 수집합니다. 랩 타임, 섹터 기록뿐만 아니라 초당 수십 회 발생하는 차량 텔레메트리(속도, RPM, 기어, 스로틀 등)를 구조화하여 저장하는 백엔드 데이터 파이프라인입니다. 초기 MongoDB ETL 버전을 기반으로, 현재는 OpenF1 텔레메트리 → Fargate(Producer) → Kinesis Data Streams → Firehose(Parquet 변환) → S3 데이터레이크 구조의 AWS 실시간 파이프라인으로 재구축하고 있습니다.",
+      features: [
+        "Smart Recovery Mode: 수집 중단 시 처음부터 다시 하지 않고, 메타데이터와 텔레메트리 데이터 유무를 확인해 누락된 세션만 선별 수집",
+        "MongoDB 인덱싱 최적화: 연도/라운드/세션/드라이버 복합 인덱스를 적용하여 대용량 데이터 조회 속도 보장",
+        "API 호출 안정성 확보: 랜덤 쿨다운(Sleep) 및 오류 발생 시 자동 재시도/로그 기록 시스템 구축",
+        "(재구축 중) Kinesis Data Streams → Firehose → S3 Parquet 데이터레이크 기반 실시간 스트리밍 파이프라인 + SageMaker 타이어 마모·랩타임 예측"
+      ],
+      techStack: ["Python 3.11", "MongoDB", "FastF1", "AWS Kinesis / Firehose / S3", "AWS Fargate", "SageMaker"],
+      troubleshooting: [
+        {
+          problem: "API 데이터 구조가 다른 '프리시즌 테스팅(Round 0)' 이벤트 호출 시 파이프라인 셧다운 발생",
+          solution: "정규 시즌 데이터만 분석하기 위해 루프 진입 시 RoundNumber가 0인 경우를 감지하여 즉시 continue 처리하는 예외 처리를 추가, 전체 수집 프로세스의 연속성을 확보함."
+        },
+        {
+          problem: "수십만 건의 텔레메트리 데이터 적재 중 네트워크 불안정으로 인한 부분 데이터 저장 문제",
+          solution: "단순히 데이터 존재 여부만 체크하는 것이 아니라, 텔레메트리 데이터 개수(Count > 100)를 확인하여 데이터가 불완전하게 저장된 세션은 자동으로 재수집하도록 로직을 개선함."
+        }
+      ],
+      screenshots: [f1ProjectImage]
+    }
+  },
+  {
+    title: "CICIoT2023 데이터셋 기반 IoT 공격 탐지",
+    description: "CICIoT2023 데이터셋을 기반으로 머신러닝 모델을 학습시켜 공격 트래픽 종류를 분류하는 모델 생성",
+    tech: ["Python 3.11", "sklearn", "Pandas", "Numpy"],
+    image: cicImage1,
+    github: "https://github.com/F3ZLoV/Term_Project_CICIoT2023_ML",
+    notion: "",
+    details: {
+      overview: "105개 실제 IoT 기기에 대한 최신 공격을 실행한 데이터 CICIoT2023 데이터셋을 기반으로 33종의 공격을 분류하는 ML 모델 생성",
+      features: [
+        "2, 8, 34-Class 분류로 그룹을 나누어 분류 모델 성능 테스트",
+        "XGBoost와 LightGBM 부스팅 모델의 성능 비교 및 향상 테스트"
+      ],
+      techStack: ["Python 3.11", "sklearn", "Pandas", "Numpy"],
+      troubleshooting: [
+        {
+          problem: "대용량 데이터셋(수십 GB) 로드시 메모리 부족(OOM) 현상 발생",
+          solution: "Pandas의 chunksize 옵션을 활용해 데이터를 분할 로드하고, 데이터 타입을 최적화(float64 -> float32)하여 메모리 사용량을 효율적으로 관리함."
+        },
+        {
+          problem: "DDoS 데이터 과밀집으로 인한 소수 클래스(Web, BruteForce) 탐지율 저조",
+          solution: "클래스 불균형 해소를 위해 SMOTE 오버샘플링 기법을 적용하고, 모델 학습 시 scale_pos_weight 파라미터를 조정하여 소수 클래스의 가중치를 높임."
+        }
+      ],
+      screenshots: [cicImage1, cicImage2, cicImage3]
+    }
+  },
+  {
     title: "Hi-Fi 사용자 커뮤니티 게시판",
     description: "AWS EC2 배포, 댓글/파일첨부 등 풀스택 커뮤니티 기능 구현",
     tech: ["JSP/Servlet", "HTML", "AWS EC2", "MySQL"],
@@ -335,30 +305,6 @@ const projects = [
         }
       ],
       screenshots: [commuImage]
-    }
-  },
-  {
-    title: "은행 계좌 관리 시뮬레이터",
-    description: "Java GUI 기반 계좌 생성/송금/관리 데스크탑 애플리케이션",
-    tech: ["Java", "MySQL", "WindowBuilder"],
-    image: bankImage,
-    github: "https://github.com/F3ZLoV/BankAccountManage-WindowApp",
-    notion: "https://www.notion.so/1e9a55bf89ae80ce9578d1eb6b9dfd1b",
-    details: {
-      overview: "Java Swing을 사용하여 개발한 데스크탑 은행 계좌 관리 프로그램입니다.",
-      features: [
-        "계좌 개설 (일반, 적금 예금 등)",
-        "실시간 계좌 이체 및 잔액 조회",
-        "기간별 거래 내역 조회"
-      ],
-      techStack: ["Java SE", "Swing", "MySQL", "JDBC"],
-      troubleshooting: [
-        {
-          problem: "계좌 이체 도중 예외 발생 시, 송금자 잔액은 차감되었으나 수취인에게는 입금되지 않는 데이터 불일치(돈 증발) 위험 발견",
-          solution: "JDBC Connection의 setAutoCommit(false)를 설정하여 송금, 입금, 내역 저장을 하나의 트랜잭션으로 묶고, 예외 발생 시 전체 작업을 Rollback하도록 구현하여 데이터 무결성을 보장함."
-        }
-      ],
-      screenshots: [bankImage]
     }
   },
 ]
@@ -564,7 +510,7 @@ const prevScreenshot = () => {
           <div class="flex items-center justify-between border-b-2 border-foreground pb-6">
             <div class="space-y-2">
               <h1 class="text-5xl font-extrabold tracking-tight">박태준</h1>
-              <p class="text-xl font-semibold text-muted-foreground">Backend Developer & Cloud Engineer</p>
+              <p class="text-xl font-semibold text-muted-foreground">Cloud & Backend Engineer</p>
               <div class="flex flex-col gap-1 text-sm text-muted-foreground pt-2">
                 <div class="flex items-center gap-2"><Phone class="w-3 h-3"/> 010-2483-5726</div>
                 <div class="flex items-center gap-2"><Mail class="w-3 h-3"/> fsirtru@gmail.com</div>
@@ -583,7 +529,7 @@ const prevScreenshot = () => {
           <div>
             <h2 class="text-xl font-bold mb-2 uppercase border-l-4 border-foreground pl-3">Profile</h2>
             <p class="text-sm leading-relaxed text-muted-foreground text-justify">
-              컴퓨터 게임을 좋아하는 게이머로서 항상 사용자의 입장을 생각합니다. 단순한 기능 구현을 넘어 안정적인 백엔드 시스템 구축과 효율적인 클라우드 엔지니어링까지 경험하며, 모르는 것을 두려워하지 않고 끊임없이 성장하는 개발자가 되고 싶습니다.
+              단순한 기능 구현을 넘어 그 아래 인프라까지 파고드는 백엔드·클라우드 엔지니어를 지향합니다. AWS 서버리스 아키텍처 설계부터 Kubernetes 오토스케일링 연구까지, 안정적으로 배포하고 확장하는 시스템에 관심을 두고 모르는 것을 두려워하지 않으며 끊임없이 성장하고 있습니다.
             </p>
           </div>
 
@@ -666,7 +612,7 @@ const prevScreenshot = () => {
                     </div>
                   </div>
                   <div>
-                    <h3 class="text-sm font-bold text-muted-foreground mb-2">DevOps</h3>
+                    <h3 class="text-sm font-bold text-muted-foreground mb-2">DevOps &amp; Cloud</h3>
                     <div class="flex flex-wrap gap-2">
                       <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
                         <img :src="gitIcon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">Git <span class="text-green-600 font-bold">(상)</span></span>
@@ -681,7 +627,7 @@ const prevScreenshot = () => {
                         <img :src="dockerIcon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">Docker <span class="text-blue-600 font-bold">(중)</span></span>
                       </span>
                       <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
-                        <img :src="k8sIcon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">Kubernetes <span class="text-yellow-600 font-bold">(하)</span></span>
+                        <img :src="k8sIcon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">Kubernetes <span class="text-blue-600 font-bold">(중)</span></span>
                       </span>
                     </div>
                   </div>
@@ -704,7 +650,7 @@ const prevScreenshot = () => {
               나의 여정
             </h3>
             <p class="text-sm leading-7 text-muted-foreground text-justify">
-              저는 '모르는 것을 두려워하지 않는 개발자'가 되고 싶습니다. 3학년 때 Spring 경험이 전무한 상태에서 병원 EMR 시스템 개발에 도전해, 강의와 공식 문서를 참고하며 Spring Boot를 독학했습니다. 그 결과 DB 연동부터 예약·진료 이력 관리까지 갖춘 시스템을 완성했고, '개발은 문제를 해결해나가는 과정'임을 깊이 체감했습니다.
+              저는 '기능 구현에서 멈추지 않고 그 아래 인프라까지 파고드는 엔지니어'를 지향합니다. Spring 경험이 전무한 상태에서 병원 EMR 시스템을 독학으로 완성한 경험을 시작으로, 단순히 동작하는 코드를 넘어 '어떻게 안정적으로 배포하고 확장할 것인가'라는 질문에 관심을 갖게 되었습니다.
             </p>
           </div>
 
@@ -714,7 +660,7 @@ const prevScreenshot = () => {
               기술과 도전
             </h3>
             <p class="text-sm leading-7 text-muted-foreground text-justify">
-              대학에서 쌓은 경험은 개발자로서의 토대가 되었지만, 동시에 배워야 할 것이 많다는 것도 깨달았습니다. 앞으로는 현장에서 직접 부딪히며 실전 경험을 쌓고, 실패를 두려워하지 않고 시행착오 속에서 단단하게 성장하는 개발자가 되겠습니다.
+              이후 5인 팀 프로젝트에서 AWS Lambda 35개 규모의 서버리스 백엔드 인프라를 단독으로 설계·배포하며 클라우드 운영을 깊이 경험했고, Kubernetes 오토스케일링을 ML로 개선하는 연구를 단독으로 수행해 한국컴퓨터정보학회(KSCI)에 논문을 투고했습니다. 그 밖에 컴퓨터 비전 수업에서 학우 29명이 사용하는 AWS 실습 환경의 구축과 운영을 돕기도 하며, 여러 사용자가 함께 쓰는 클라우드 환경을 다뤄봤습니다. 이 과정에서 '문제를 코드로만 푸는 것'과 '시스템 전체 관점에서 푸는 것'의 차이를 체감했습니다.
             </p>
           </div>
 
@@ -724,8 +670,8 @@ const prevScreenshot = () => {
               미래로의 도약
             </h3>
             <p class="text-sm leading-7 text-muted-foreground text-justify">
-              저는 대학에서의 다양한 강의와 과제 활동, 프로젝트를 통해 실무에서 필요한 기초 역량을 쌓는 귀중한 경험을 하였습니다. 이러한 경험들은 개발자로서의 토대를 다지는 데 큰 도움이 되었지만, 동시에 아직 배워야 할 것이 차고 넘친다는 사실도 깨달았습니다. <br/><br/>
-              앞으로는 학교라는 울타리를 넘어 직접 현장에서 부딪혀 보며 실전 경험을 쌓고 싶습니다. 실패를 두려워하지 않고 그 속에서 교훈을 얻으며, 부족한 점을 스스로 파악해 끊임없이 성장해 나갈 것입니다. 단순히 빠른 결과만을 추구하기보다는, 시행착오를 겪고 스스로 고민하고 해결하는 과정들을 저의 소중한 자산이라 여기며 한 걸음씩 단단하게 전진하는 개발자가 되겠습니다.
+              학교에서 쌓은 경험은 엔지니어로서의 토대가 되었지만, 실무의 인프라 규모와 안정성 요구는 또 다른 차원임을 알고 있습니다. <br/><br/>
+              앞으로는 학교라는 울타리를 넘어 현장에서 직접 부딪히며 실전 경험을 쌓고 싶습니다. 빠른 결과만을 추구하기보다 시행착오 속에서 시스템의 근본을 이해하고, 부족한 점을 스스로 파악해 채워 나가겠습니다. 스스로 고민하고 해결하는 과정을 소중한 자산으로 여기며, 안정적인 시스템을 만드는 백엔드·클라우드 엔지니어로 한 걸음씩 단단하게 전진하겠습니다.
             </p>
           </div>
         </div>
@@ -810,8 +756,8 @@ const prevScreenshot = () => {
                   <a :href="selectedProject.github" target="_blank" class="flex items-center gap-1 hover:text-primary transition-colors">
                     <Github class="w-4 h-4" /> GitHub
                   </a>
-                  <span class="hidden md:inline">|</span>
-                  <a :href="selectedProject.notion" target="_blank" class="flex items-center gap-1 hover:text-primary transition-colors">
+                  <span v-if="selectedProject.notion" class="hidden md:inline">|</span>
+                  <a v-if="selectedProject.notion" :href="selectedProject.notion" target="_blank" class="flex items-center gap-1 hover:text-primary transition-colors">
                     <img :src="notionImage" class="w-4 h-4" alt="notion" /> Notion
                   </a>
                 </div>
