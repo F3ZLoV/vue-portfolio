@@ -29,7 +29,6 @@ import emrImage2 from './assets/images/EMR2.jpg'
 import emrImage3 from './assets/images/EMR3.jpg'
 import emrImage4 from './assets/images/EMR4.jpg'
 import commuImage from './assets/images/commu.png'
-import hamterImage from './assets/images/hamter.png'
 import notionImage from './assets/images/notion.png'
 import cicImage1 from './assets/images/CICIoT2023_1.png'
 import cicImage2 from './assets/images/CICIoT2023_2.png'
@@ -87,7 +86,7 @@ const projects = [
   {
     featured: true,
     title: "Smart Study Messenger — AWS 서버리스 실시간 메신저",
-    description: "Discord 스타일의 학습 협업 메신저. AWS Lambda 35개 + DynamoDB 7테이블 + SQS 비동기 큐 + Bedrock AI 분석 기반 서버리스 풀스택 프로젝트",
+    description: "5인팀 백엔드 인프라 리드로 단독 설계한 AWS 서버리스 실시간 메신저. Lambda 35개·DynamoDB 7테이블, 트러블슈팅 6건 해결",
     tech: ["AWS Lambda", "API Gateway", "DynamoDB", "SQS", "Bedrock", "React"],
     image: smartstudyImage,
     github: "https://github.com/jeonghyeonme/CloudService",
@@ -145,7 +144,7 @@ const projects = [
   {
     featured: true,
     title: "ML 기반 Kubernetes 사전 오토스케일링 — 트래픽 Archetype별 예측 스케일러 평가",
-    description: "KSCI(한국컴퓨터정보학회) 투고 · 학사 학위 논문 · 단독 연구·구현. LSTM·GRU·Ensemble과 HPA를 7개 트래픽 시나리오 × 84 run으로 비교 평가하고, 자체 개발한 Lead Time 측정 도구로 'No Universal Winner' 명제를 실증",
+    description: "KSCI 투고 · 단독 집필. LSTM/GRU/앙상블 vs HPA 84회 실험, 리드타임 측정 도구 자체 개발로 'No Universal Winner' 실증",
     tech: ["Kubernetes", "KEDA", "TensorFlow", "FastAPI", "LSTM/GRU", "Prometheus"],
     image: ksciImage1,
     github: "https://github.com/F3ZLoV/ML-based-Kubernetes-Pre-AutoScaling/tree/dev",
@@ -510,7 +509,11 @@ const prevScreenshot = () => {
           <div class="flex items-center justify-between border-b-2 border-foreground pb-6">
             <div class="space-y-2">
               <h1 class="text-5xl font-extrabold tracking-tight">박태준</h1>
-              <p class="text-xl font-semibold text-muted-foreground">Cloud & Backend Engineer</p>
+              <p class="text-xl font-semibold text-muted-foreground">Cloud &amp; Backend Engineer</p>
+              <div class="pt-2 space-y-1 text-sm text-foreground/80">
+                <p>AWS 서버리스 실시간 메신저를 5인팀 백엔드 인프라 리드로 단독 설계 <span class="text-muted-foreground">(Lambda 35개·DynamoDB 7테이블)</span></p>
+                <p>쿠버네티스 오토스케일링 학회 논문 단독 집필 <span class="text-muted-foreground">— HPA 대비 84회 실험으로 검증</span></p>
+              </div>
               <div class="flex flex-col gap-1 text-sm text-muted-foreground pt-2">
                 <div class="flex items-center gap-2"><Phone class="w-3 h-3"/> 010-2483-5726</div>
                 <div class="flex items-center gap-2"><Mail class="w-3 h-3"/> fsirtru@gmail.com</div>
@@ -528,8 +531,8 @@ const prevScreenshot = () => {
 
           <div>
             <h2 class="text-xl font-bold mb-2 uppercase border-l-4 border-foreground pl-3">Profile</h2>
-            <p class="text-sm leading-relaxed text-muted-foreground text-justify">
-              단순한 기능 구현을 넘어 그 아래 인프라까지 파고드는 백엔드·클라우드 엔지니어를 지향합니다. AWS 서버리스 아키텍처 설계부터 Kubernetes 오토스케일링 연구까지, 안정적으로 배포하고 확장하는 시스템에 관심을 두고 모르는 것을 두려워하지 않으며 끊임없이 성장하고 있습니다.
+            <p class="text-sm leading-7 text-muted-foreground text-justify">
+              현재는 리눅스 서버 밑바닥부터 온프렘 3-tier 인프라를 직접 구축하며 이중화·복제·관측성을 손으로 익히고 있습니다. 서비스 위에서 다뤄본 클라우드 경험과, 밑바닥에서 쌓는 시스템 이해를 연결해 장애에 강한 인프라를 만드는 엔지니어로 성장하는 것이 목표입니다.
             </p>
           </div>
 
@@ -650,7 +653,7 @@ const prevScreenshot = () => {
               나의 여정
             </h3>
             <p class="text-sm leading-7 text-muted-foreground text-justify">
-              저는 '기능 구현에서 멈추지 않고 그 아래 인프라까지 파고드는 엔지니어'를 지향합니다. Spring 경험이 전무한 상태에서 병원 EMR 시스템을 독학으로 완성한 경험을 시작으로, 단순히 동작하는 코드를 넘어 '어떻게 안정적으로 배포하고 확장할 것인가'라는 질문에 관심을 갖게 되었습니다.
+              클라우드·컨테이너를 서비스 위에서 다뤄봤고, 지금은 리눅스 서버 밑바닥까지 직접 구축하며 이해하는 인프라 엔지니어입니다. AWS 서버리스 인프라를 팀 리드로 단독 설계·배포했고, 쿠버네티스 오토스케일링을 학회 논문 수준으로 실험·검증했습니다.
             </p>
           </div>
 
