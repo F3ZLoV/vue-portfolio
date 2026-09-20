@@ -14,7 +14,6 @@ import {
   Moon,
   FileText,
   Loader2,
-  Phone,
   MapPin,
   ExternalLink,
   ChevronLeft,
@@ -28,7 +27,6 @@ import emrImage from './assets/images/EMR.png'
 import emrImage2 from './assets/images/EMR2.jpg'
 import emrImage3 from './assets/images/EMR3.jpg'
 import emrImage4 from './assets/images/EMR4.jpg'
-import commuImage from './assets/images/commu.png'
 import notionImage from './assets/images/notion.png'
 import cicImage1 from './assets/images/CICIoT2023_1.png'
 import cicImage2 from './assets/images/CICIoT2023_2.png'
@@ -39,24 +37,80 @@ import smartstudyImage2 from './assets/images/smartstudy_ai.png'
 import smartstudyImage3 from './assets/images/smartstudy_architecture.png'
 import smartstudyImage4 from './assets/images/smartstudy_erd.png'
 import smartstudyImage5 from './assets/images/smartstudy_google_login.png'
+import onpremImage from './assets/images/onprem_3tier.svg'
 import ksciImage1 from './assets/images/fig1.png'
 import ksciImage2 from './assets/images/fig2.png'
 import ksciImage3 from './assets/images/fig4.png'
 import ksciImage4 from './assets/images/fig7.png'
 import ksciImage5 from './assets/images/fig8.png'
 
-import javaIcon from './assets/icons/java-original.png'
-import springIcon from './assets/icons/spring-original.png'
-import pythonIcon from './assets/icons/python-original.png'
-import html5Icon from './assets/icons/html5-original.png'
-import css3Icon from './assets/icons/css3-original.png'
+import linuxIcon from './assets/icons/linux-original.png'
+import bashIcon from './assets/icons/bash-original.png'
+import nginxIcon from './assets/icons/nginx-original.png'
+import ansibleIcon from './assets/icons/ansible-original.png'
+import prometheusIcon from './assets/icons/prometheus-original.png'
+import grafanaIcon from './assets/icons/grafana-original.png'
+import postgresIcon from './assets/icons/postgresql-original.png'
+import mariadbIcon from './assets/icons/mariadb-original.png'
 import mysqlIcon from './assets/icons/mysql-original.png'
-import oracleIcon from './assets/icons/oracle-original.png'
-import gitIcon from './assets/icons/git-original.png'
-import githubIcon from './assets/icons/github-original.png'
 import awsIcon from './assets/icons/amazonwebservices-original-wordmark.png'
 import dockerIcon from './assets/icons/docker-original.png'
 import k8sIcon from './assets/icons/kubernetes-plain.png'
+import springIcon from './assets/icons/spring-original.png'
+import pythonIcon from './assets/icons/python-original.png'
+import gitIcon from './assets/icons/git-original.png'
+
+// --- 스킬 (직접 설치·구성하고 장애를 겪어본 범위만) ---
+const skillGroups = [
+  {
+    category: 'Linux & Server',
+    items: [
+      { name: 'Rocky Linux 9 / RHEL', level: '중', icon: linuxIcon, invert: true },
+      { name: 'Shell Script', level: '중', icon: bashIcon, invert: true },
+      { name: 'SELinux · LVM', level: '초' }
+    ]
+  },
+  {
+    category: 'High Availability',
+    items: [
+      { name: 'HAProxy', level: '중' },
+      { name: 'Keepalived / VRRP', level: '중' },
+      { name: 'Nginx', level: '중', icon: nginxIcon }
+    ]
+  },
+  {
+    category: 'Automation & Monitoring',
+    items: [
+      { name: 'Ansible', level: '중', icon: ansibleIcon, invert: true },
+      { name: 'Prometheus', level: '초', icon: prometheusIcon },
+      { name: 'Grafana', level: '초', icon: grafanaIcon }
+    ]
+  },
+  {
+    category: 'Database',
+    items: [
+      { name: 'PostgreSQL 스트리밍 복제', level: '중', icon: postgresIcon },
+      { name: 'MySQL', level: '초', icon: mysqlIcon },
+      { name: 'MariaDB', level: '초', icon: mariadbIcon, invert: true }
+    ]
+  },
+  {
+    category: 'Cloud & Container',
+    items: [
+      { name: 'AWS', level: '중', icon: awsIcon },
+      { name: 'Docker', level: '중', icon: dockerIcon },
+      { name: 'Kubernetes', level: '초', icon: k8sIcon }
+    ]
+  },
+  {
+    category: 'Development',
+    items: [
+      { name: 'Java / Spring Boot', level: '초', icon: springIcon },
+      { name: 'Python', level: '초', icon: pythonIcon },
+      { name: 'Git', level: '중', icon: gitIcon }
+    ]
+  }
+]
 
 // --- 상태 관리 ---
 const isDark = ref(false)
@@ -85,9 +139,52 @@ const navItems = ['home', 'about', 'projects', 'contact']
 const projects = [
   {
     featured: true,
+    title: "온프레미스 3-Tier 고가용성 인프라 구축",
+    period: "2026.08 ~ 진행 중 · 개인 프로젝트",
+    description: "VM 7대로 로드밸런서–웹–DB 3계층을 분리 구축하고 계층별 이중화와 장애 복구까지 직접 구성. VIP 페일오버 실측 다운타임 약 1초, 전 구성을 Ansible 롤로 코드화해 단일 명령으로 재현 가능",
+    tech: ["Rocky Linux 9", "Ansible", "HAProxy", "Keepalived", "Nginx", "PostgreSQL", "LVM", "SELinux"],
+    image: onpremImage,
+    github: "https://github.com/F3ZLoV/onprem-3tier",
+    notion: "",
+    details: {
+      overview: "관리형 서비스가 대신 처리해주던 계층을 직접 만들어보기 위해 Rocky Linux 9 VM 7대로 로드밸런서–웹–DB 3계층을 분리 구축한 개인 프로젝트. 계층별 이중화를 하나씩 붙이고, 구성했다고 끝내는 대신 실제로 노드를 죽여 전환과 다운타임을 측정하는 것을 원칙으로 함. 전 구성을 Ansible 롤로 코드화해 단일 명령으로 재현 가능하도록 만들었고, SELinux를 enforcing으로 유지한 상태에서 구축을 완료함. 기반 구축 · 웹 계층 · 로드밸런서 이중화 · DB 복제까지 구성을 마쳤고, 자동 백업·복구와 모니터링(Prometheus/Grafana/Loki), 네트워크 분리를 다음 단계로 확장하고 있음.",
+      features: [
+        "HAProxy L7 로드밸런싱 + 헬스체크로 백엔드 자동 장애 제외 구성, 웹 서버 1대 정지 시 무중단 서비스 검증",
+        "Keepalived VRRP 기반 VIP 페일오버 구성, MASTER 노드 강제 종료 시 실측 다운타임 약 1초 확인 (1초 간격 curl 루프로 측정)",
+        "PostgreSQL 스트리밍 복제(primary/replica) 구성 및 LVM 전용 데이터 볼륨 분리로 OS 파티션과 격리",
+        "전 구성을 Ansible 롤로 코드화. host_vars 기반 역할 분기로 동일 롤에서 MASTER/BACKUP, primary/replica를 구분 배포",
+        "SELinux enforcing 유지 상태로 구축 — 비활성화 없이 포트 라벨링(semanage)과 컨텍스트 복원(restorecon)으로 정책 준수",
+        "자격증명은 ansible-vault로 암호화, pg_hba 접근 규칙을 단일 IP + scram-sha-256으로 축소 (최소 권한 적용)"
+      ],
+      techStack: [
+        "Rocky Linux 9",
+        "HAProxy (L7 + 헬스체크)",
+        "Keepalived (VRRP / VIP)",
+        "Nginx",
+        "PostgreSQL (스트리밍 복제)",
+        "Ansible (롤 · host_vars · vault)",
+        "LVM",
+        "SELinux (semanage / restorecon)"
+      ],
+      troubleshooting: [
+        {
+          problem: "PostgreSQL 복제 접속이 지속 거부됨. pg_hba.conf에 허용 규칙이 존재하고 pg_hba_file_rules 뷰에서 정상 파싱까지 확인됐으나 런타임 매칭이 되지 않음.",
+          solution: "변수를 단계적으로 배제하며 범위를 축소함. ① 인증 방식을 trust로 변경해 인증 계층을 배제, ② 주소를 0.0.0.0/0으로 확대해 범위 문제를 배제, ③ primary가 자기 자신에게 복제 접속을 시도해 네트워크·클라이언트를 배제. 세 계층이 모두 배제되어 설정 파일 자체의 문제로 특정했고, 원인은 sed 기반 반복 편집으로 파일에 누적된 비가시적 손상이었음. 부분 수정 대신 파일 전체를 재생성해 해결하고, 동일 문제 재발을 막기 위해 Ansible template 모듈로 전체 생성하는 방식으로 전환함."
+        },
+        {
+          problem: "중첩 SSH 세션에서 대상 서버를 착각해 primary DB의 데이터 디렉토리를 삭제.",
+          solution: "initdb로 클러스터를 재생성한 뒤 복제 설정과 계정을 재구성함 (LVM 마운트는 유지되어 스토리지 계층 재작업은 불필요). 사후 조치에 그치지 않고 자동화 코드에 멱등성 가드를 추가함. pg_basebackup은 데이터 디렉토리를 비우는 파괴적 작업이므로, standby.signal 존재 여부를 확인해 이미 구성된 replica에서는 관련 task 전체를 skip하도록 구성.",
+          code: "- name: Check if replica is already configured\n  ansible.builtin.stat:\n    path: \"{{ pg_data_dir }}/standby.signal\"\n  register: standby_signal\n\n# 이하 파괴적 task 전체에 다음 조건을 적용\n# when: not standby_signal.stat.exists"
+        }
+      ],
+      screenshots: [onpremImage]
+    }
+  },
+  {
+    featured: true,
     title: "Smart Study Messenger — AWS 서버리스 실시간 메신저",
     description: "5인팀 백엔드 인프라 리드로 단독 설계한 AWS 서버리스 실시간 메신저. Lambda 35개·DynamoDB 7테이블, 트러블슈팅 6건 해결",
-    tech: ["AWS Lambda", "API Gateway", "DynamoDB", "SQS", "Bedrock", "React"],
+    tech: ["AWS Lambda", "API Gateway", "DynamoDB", "SQS", "Bedrock", "CloudWatch"],
     image: smartstudyImage,
     github: "https://github.com/jeonghyeonme/CloudService",
     notion: "https://befitting-shark-cf5.notion.site/3-2e00f81ea81080aeaaa9c59610c336e9?pvs=74",
@@ -109,7 +206,7 @@ const projects = [
         "Amazon Bedrock (Claude 3 Haiku)",
         "Amazon Rekognition + Translate",
         "Amazon S3 (Pre-signed URL)",
-        "React + WebSocket",
+        "Amazon CloudWatch (로그·지표)",
         "google-auth-library (Google OAuth)"
       ],
       troubleshooting: [
@@ -142,17 +239,16 @@ const projects = [
     }
   },
   {
-    featured: true,
     title: "ML 기반 Kubernetes 사전 오토스케일링 — 트래픽 Archetype별 예측 스케일러 평가",
     description: "KSCI 투고 · 단독 집필. LSTM/GRU/앙상블 vs HPA 84회 실험, 리드타임 측정 도구 자체 개발로 'No Universal Winner' 실증",
-    tech: ["Kubernetes", "KEDA", "TensorFlow", "FastAPI", "LSTM/GRU", "Prometheus"],
+    tech: ["Kubernetes", "HPA", "TensorFlow", "FastAPI", "LSTM/GRU", "Prometheus"],
     image: ksciImage1,
     github: "https://github.com/F3ZLoV/ML-based-Kubernetes-Pre-AutoScaling/tree/dev",
     notion: "",
     details: {
-      overview: "Kubernetes 기본 오토스케일러 HPA의 사후 대응(reactive) 구조가 유발하는 cold start 지연을, ML 트래픽 예측 기반의 선제적(proactive) 스케일 아웃으로 해결·검증한 실증 연구. DigitalOcean Kubernetes(DOKS) 환경에서 KEDA External Metrics API로 LSTM·GRU·Ensemble 예측값을 스케일링 트리거로 연동하고, HPA와 함께 4개 트래픽 archetype(SPIKE·STATIONARY·RAMP·PERIODIC)을 포함한 7개 시나리오에서 총 84회(912 스케일링 이벤트)를 실측 비교. 특히 '스케일 명령 발행 → 새 파드 Ready 도달'까지의 리드 타임을 직접 측정하는 도구를 자체 개발해, 기존 연구가 놓친 운영 지표를 정량화. 결과적으로 단일 모델이 모든 패턴에서 우월하지 않다는 'No Universal Winner' 명제를 실측으로 도출(HPA 4승 / GRU 2승 / Ensemble 1승 / LSTM 0승)하고, GRU가 RAMP 시나리오에서 HPA 대비 리드 타임 15.1%·P95 지연 25.9% 개선을 달성함을 확인.",
+      overview: "Kubernetes 기본 오토스케일러 HPA의 사후 대응(reactive) 구조가 유발하는 cold start 지연을, ML 트래픽 예측 기반의 선제적(proactive) 스케일 아웃으로 해결·검증한 실증 연구. DigitalOcean Kubernetes(DOKS) 환경에서 External Metrics API로 LSTM·GRU·Ensemble 예측값을 스케일링 트리거로 연동하고, HPA와 함께 4개 트래픽 archetype(SPIKE·STATIONARY·RAMP·PERIODIC)을 포함한 7개 시나리오에서 총 84회(912 스케일링 이벤트)를 실측 비교. 특히 '스케일 명령 발행 → 새 파드 Ready 도달'까지의 리드 타임을 직접 측정하는 도구를 자체 개발해, 기존 연구가 놓친 운영 지표를 정량화. 결과적으로 단일 모델이 모든 패턴에서 우월하지 않다는 'No Universal Winner' 명제를 실측으로 도출(HPA 4승 / GRU 2승 / Ensemble 1승 / LSTM 0승)하고, GRU가 RAMP 시나리오에서 HPA 대비 리드 타임 15.1%·P95 지연 25.9% 개선을 달성함을 확인.",
       features: [
-        "KEDA External Metrics API(metrics-api 트리거, targetValue=1)로 ML 추론 서버 예측값(predicted_replicas)을 스케일링 결정 입력으로 직접 연동",
+        "Kubernetes External Metrics API(metrics-api 트리거, targetValue=1)로 ML 추론 서버 예측값(predicted_replicas)을 스케일링 결정 입력으로 직접 연동",
         "Kubernetes Watch API 기반 리드 타임 측정 도구 자체 개발 (scale-out 명령 → pod condition.Ready 전환 시각 차이를 이벤트별 계측, CSV 로깅)",
         "7 시나리오 × 4 스케일러 × 3회 = 84 run 자동화 실험 파이프라인, 912건 스케일링 이벤트 분석 (리드타임·P95/P99·에러율·Time-to-Peak·Aggressiveness 5종 지표)",
         "실 트래픽 재현: AWS CloudWatch · Alibaba Cluster Trace 2018 · Wikimedia Pageview API를 Locust custom LoadShape로 리샘플링해 부하 발생",
@@ -162,7 +258,6 @@ const projects = [
       ],
       techStack: [
         "Kubernetes (DOKS)",
-        "KEDA (External Metrics)",
         "HPA",
         "Prometheus + Grafana",
         "Locust (custom LoadShape)",
@@ -224,20 +319,19 @@ const projects = [
   },
   {
     title: "F1 레이싱 텔레메트리 데이터 파이프라인 구축",
-    description: "FastF1 API로 2018-2026년 F1 레이스 데이터(랩 타임, 텔레메트리, 날씨)를 수집·적재하는 ETL 파이프라인 → 현재 AWS(Kinesis·Firehose·S3 데이터레이크) 기반 실시간 파이프라인으로 재구축 중",
-    tech: ["Python", "MongoDB", "AWS Kinesis", "FastF1"],
+    description: "FastF1 API로 2018–2025 시즌 F1 레이스 데이터(랩 타임, 텔레메트리, 날씨)를 수집해 MongoDB에 적재하는 ETL 파이프라인. 중단 지점부터 이어받는 선별 재수집으로 수십만 건 적재 안정성 확보",
+    tech: ["Python", "MongoDB", "FastF1", "ETL"],
     image: f1ProjectImage,
     github: "https://github.com/F3ZLoV/BigDataProject_Formula1_Telemetry",
     notion: "",
     details: {
-      overview: "F1 레이싱의 초정밀 데이터 분석을 위해 FastF1 라이브러리로 연도별 전 경기 데이터를 수집합니다. 랩 타임, 섹터 기록뿐만 아니라 초당 수십 회 발생하는 차량 텔레메트리(속도, RPM, 기어, 스로틀 등)를 구조화하여 저장하는 백엔드 데이터 파이프라인입니다. 초기 MongoDB ETL 버전을 기반으로, 현재는 OpenF1 텔레메트리 → Fargate(Producer) → Kinesis Data Streams → Firehose(Parquet 변환) → S3 데이터레이크 구조의 AWS 실시간 파이프라인으로 재구축하고 있습니다.",
+      overview: "FastF1 라이브러리로 연도별 전 경기 데이터를 수집해 MongoDB에 적재하는 배치 ETL 파이프라인. 랩 타임과 섹터 기록뿐 아니라 초당 수십 회 발생하는 차량 텔레메트리(속도, RPM, 기어, 스로틀)를 구조화해 저장한다. 수집량이 수십만 건 규모라 중단·부분 저장이 잦았고, 이를 처음부터 다시 받지 않고 누락분만 판별해 이어받는 복구 로직과 복합 인덱스 설계에 대부분의 시간을 썼다.",
       features: [
         "Smart Recovery Mode: 수집 중단 시 처음부터 다시 하지 않고, 메타데이터와 텔레메트리 데이터 유무를 확인해 누락된 세션만 선별 수집",
         "MongoDB 인덱싱 최적화: 연도/라운드/세션/드라이버 복합 인덱스를 적용하여 대용량 데이터 조회 속도 보장",
-        "API 호출 안정성 확보: 랜덤 쿨다운(Sleep) 및 오류 발생 시 자동 재시도/로그 기록 시스템 구축",
-        "(재구축 중) Kinesis Data Streams → Firehose → S3 Parquet 데이터레이크 기반 실시간 스트리밍 파이프라인 + SageMaker 타이어 마모·랩타임 예측"
+        "API 호출 안정성 확보: 랜덤 쿨다운(Sleep) 및 오류 발생 시 자동 재시도/로그 기록 시스템 구축"
       ],
-      techStack: ["Python 3.11", "MongoDB", "FastF1", "AWS Kinesis / Firehose / S3", "AWS Fargate", "SageMaker"],
+      techStack: ["Python 3.11", "MongoDB", "PyMongo", "FastF1"],
       troubleshooting: [
         {
           problem: "API 데이터 구조가 다른 '프리시즌 테스팅(Round 0)' 이벤트 호출 시 파이프라인 셧다운 발생",
@@ -276,34 +370,6 @@ const projects = [
         }
       ],
       screenshots: [cicImage1, cicImage2, cicImage3]
-    }
-  },
-  {
-    title: "Hi-Fi 사용자 커뮤니티 게시판",
-    description: "AWS EC2 배포, 댓글/파일첨부 등 풀스택 커뮤니티 기능 구현",
-    tech: ["JSP/Servlet", "HTML", "AWS EC2", "MySQL"],
-    image: commuImage,
-    github: "https://github.com/F3ZLoV/JSPProject-HiFi_Community",
-    notion: "https://www.notion.so/S-W-7bd042a39cbc459ca5bac2af3379e39d",
-    details: {
-      overview: "오디오 애호가들을 위한 하이파이(Hi-Fi) 오디오 정보 공유 커뮤니티입니다.",
-      features: [
-        "회원가입, 로그인, 회원정보 수정",
-        "게시판 CRUD 및 페이징 처리",
-        "다중 파일 업로드 및 다운로드"
-      ],
-      techStack: ["Java", "JSP/Servlet", "MySQL", "AWS EC2"],
-      troubleshooting: [
-        {
-          problem: "AWS EC2 서버 재배포 시 기존에 업로드했던 이미지 파일들이 모두 삭제되는 현상",
-          solution: "파일 저장 경로를 프로젝트 내부(war)가 아닌 외부 절대 경로로 분리하고, Tomcat의 server.xml에서 <<Context>> 태그를 활용해 가상 경로(Virtual Path)를 매핑하여 해결함."
-        },
-        {
-          problem: "게시글 작성 및 DB 저장 시 한글 데이터가 물음표(???)로 깨지는 인코딩 문제",
-          solution: "JSP 상단의 setCharacterEncoding 설정뿐만 아니라, JDBC 연결 URL에 'useUnicode=true&characterEncoding=UTF-8' 옵션을 추가하여 DB 통신 구간의 인코딩을 통일함."
-        }
-      ],
-      screenshots: [commuImage]
     }
   },
 ]
@@ -374,32 +440,44 @@ const handleExportPdf = async () => {
     const pdfHeight = pdf.internal.pageSize.getHeight()
 
     const targetSections = ['home', 'about', 'projects']
+    let isFirstPage = true
 
-    for (let i = 0; i < targetSections.length; i++) {
-      const sectionKey = targetSections[i]
+    for (const sectionKey of targetSections) {
       const sectionRef = sectionRefs[sectionKey].value
 
       let element = sectionRef?.querySelector('.a4-page')
       if (!element && sectionKey === 'projects') {
         element = sectionRef?.querySelector('.container')
       }
+      if (!element) continue
 
-      if (element) {
-        await waitForImages(element)
-        const canvas = await html2canvas(element, {
-          scale: 2,
-          useCORS: true,
-          imageTimeout: 15000,
-          logging: false,
-          backgroundColor: isDark.value ? '#1e293b' : '#ffffff'
-        })
+      await waitForImages(element)
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        imageTimeout: 15000,
+        logging: false,
+        backgroundColor: isDark.value ? '#1e293b' : '#ffffff'
+      })
 
-        const imgData = canvas.toDataURL('image/png')
+      const imgData = canvas.toDataURL('image/png')
 
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight)
+      // 종횡비를 보존해 폭 기준으로 배치 (예전에는 A4 전면으로 늘려 찌그러졌음)
+      const imgWidth = pdfWidth
+      const imgHeight = (canvas.height * imgWidth) / canvas.width
 
-        if (i < targetSections.length - 1) {
-          pdf.addPage()
+      if (!isFirstPage) pdf.addPage()
+      isFirstPage = false
+
+      if (imgHeight <= pdfHeight + 1) {
+        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight)
+      } else {
+        // A4 한 장을 넘기는 섹션은 페이지 높이만큼 잘라 여러 장에 나눠 배치
+        let offsetY = 0
+        while (offsetY < imgHeight) {
+          pdf.addImage(imgData, 'PNG', 0, -offsetY, imgWidth, imgHeight)
+          offsetY += pdfHeight
+          if (offsetY < imgHeight) pdf.addPage()
         }
       }
     }
@@ -504,18 +582,18 @@ const prevScreenshot = () => {
       </nav>
 
       <section id="home" :ref="sectionRefs.home" class="pt-28 pb-16 flex justify-center px-4">
-        <div class="a4-page bg-background text-foreground p-12 flex flex-col gap-8 max-w-[794px] w-full min-h-[1123px] relative overflow-hidden mx-auto box-border rounded-sm">
+        <div class="a4-page bg-background text-foreground p-10 flex flex-col gap-6 max-w-[794px] w-full min-h-[1123px] relative overflow-hidden mx-auto box-border rounded-sm">
 
-          <div class="flex items-center justify-between border-b-2 border-foreground pb-6">
+          <div class="flex items-center justify-between border-b-2 border-foreground pb-4">
             <div class="space-y-2">
-              <h1 class="text-5xl font-extrabold tracking-tight">박태준</h1>
-              <p class="text-xl font-semibold text-muted-foreground">Cloud &amp; Backend Engineer</p>
+              <h1 class="text-4xl font-extrabold tracking-tight">박태준</h1>
+              <p class="text-xl font-semibold text-muted-foreground">Infrastructure / System Engineer</p>
               <div class="pt-2 space-y-1 text-sm text-foreground/80">
-                <p>AWS 서버리스 실시간 메신저를 5인팀 백엔드 인프라 리드로 단독 설계 <span class="text-muted-foreground">(Lambda 35개·DynamoDB 7테이블)</span></p>
-                <p>쿠버네티스 오토스케일링 학회 논문 단독 집필 <span class="text-muted-foreground">— HPA 대비 84회 실험으로 검증</span></p>
+                <p>리눅스 서버 운영과 장애 복구를 중심에 두고,<br/>클라우드·컨테이너 스택까지 이해하는 인프라 엔지니어</p>
+                <p>온프레미스 3-Tier 구축 <span class="text-muted-foreground">— VM 7대, VIP 페일오버 1초 실측</span></p>
+                <p>AWS 서버리스 백엔드 단독 설계 <span class="text-muted-foreground">— Lambda 35개·DynamoDB 7테이블</span></p>
               </div>
               <div class="flex flex-col gap-1 text-sm text-muted-foreground pt-2">
-                <div class="flex items-center gap-2"><Phone class="w-3 h-3"/> 010-2483-5726</div>
                 <div class="flex items-center gap-2"><Mail class="w-3 h-3"/> fsirtru@gmail.com</div>
                 <div class="flex items-center gap-2"><Github class="w-3 h-3"/> github.com/F3ZLoV</div>
                 <div class="flex items-center gap-2"><MapPin class="w-3 h-3"/> 인천시 서구</div>
@@ -531,108 +609,68 @@ const prevScreenshot = () => {
 
           <div>
             <h2 class="text-xl font-bold mb-2 uppercase border-l-4 border-foreground pl-3">Profile</h2>
-            <p class="text-sm leading-7 text-muted-foreground text-justify">
-              현재는 리눅스 서버 밑바닥부터 온프렘 3-tier 인프라를 직접 구축하며 이중화·복제·관측성을 손으로 익히고 있습니다. 서비스 위에서 다뤄본 클라우드 경험과, 밑바닥에서 쌓는 시스템 이해를 연결해 장애에 강한 인프라를 만드는 엔지니어로 성장하는 것이 목표입니다.
+            <p class="text-sm leading-7 text-muted-foreground">
+              Rocky Linux 9 VM 7대로 로드밸런서–웹–DB 3계층을 구축하고 HAProxy L7 헬스체크와 Keepalived VRRP로 이중화했습니다. MASTER 노드를 강제 종료해 VIP 페일오버 다운타임 약 1초를 실측했고, PostgreSQL 스트리밍 복제·LVM 분리·Ansible 롤 코드화까지 구성했습니다. AWS 서버리스 백엔드를 5인 팀에서 단독 설계·운영했고, Kubernetes 오토스케일링을 84회 실험으로 검증해 학회에 투고했습니다.
             </p>
           </div>
 
-          <div class="grid grid-cols-2 gap-10 flex-grow">
-            <div class="space-y-8">
+          <div class="flex flex-col gap-6 flex-grow">
+            <div>
+              <h2 class="text-xl font-bold mb-2 uppercase border-l-4 border-foreground pl-3">Skills &amp; Tools</h2>
+              <div class="grid grid-cols-2 gap-x-8 gap-y-3">
+                <div v-for="group in skillGroups" :key="group.category">
+                  <h3 class="text-sm font-bold text-muted-foreground mb-2">{{ group.category }}</h3>
+                  <div class="flex flex-wrap gap-1.5">
+                    <span
+                        v-for="skill in group.items"
+                        :key="skill.name"
+                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border text-xs font-semibold text-foreground whitespace-nowrap leading-none"
+                    >
+                      <img v-if="skill.icon" :src="skill.icon" class="w-3.5 h-3.5" :class="{ 'dark:invert': skill.invert }" alt="" />
+                      <span>{{ skill.name }}</span>
+                      <span
+                          class="font-bold"
+                          :class="skill.level === '중' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'"
+                      >({{ skill.level }})</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <p class="text-[11px] text-muted-foreground/70 mt-2">직접 설치·구성하고 장애를 겪어본 범위만 표기했습니다.</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-10">
               <div>
-                <h2 class="text-xl font-bold mb-4 uppercase border-l-4 border-foreground pl-3">Education</h2>
-                <div class="space-y-4">
+                <h2 class="text-xl font-bold mb-2 uppercase border-l-4 border-foreground pl-3">Education</h2>
+                <div class="space-y-2">
+                  <div class="relative pl-4 border-l-2 border-muted-foreground/20">
+                    <div class="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-muted-foreground"></div>
+                    <h3 class="font-bold text-base">인하공업전문대학</h3>
+                    <p class="text-sm font-medium text-muted-foreground">컴퓨터정보공학과 (공학사 · 4년제 과정)</p>
+                    <p class="text-xs text-muted-foreground">2026.03 ~ 2027.02 (졸업예정)</p>
+                  </div>
+                  <div class="relative pl-4 border-l-2 border-muted-foreground/20">
+                    <div class="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-muted-foreground"></div>
+                    <h3 class="font-bold text-base">인하공업전문대학</h3>
+                    <p class="text-sm font-medium text-muted-foreground">컴퓨터정보공학과 (전문학사)</p>
+                    <p class="text-xs text-muted-foreground">2020.03 ~ 2026.02</p>
+                  </div>
                   <div class="relative pl-4 border-l-2 border-muted-foreground/20">
                     <div class="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-muted-foreground"></div>
                     <h3 class="font-bold text-base">가좌고등학교</h3>
                     <p class="text-xs text-muted-foreground">~ 2020.02</p>
                   </div>
-                  <div class="relative pl-4 border-l-2 border-muted-foreground/20">
-                    <div class="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-muted-foreground"></div>
-                    <h3 class="font-bold text-base">인하공업전문대학</h3>
-                    <p class="text-sm font-medium text-muted-foreground">컴퓨터정보과 (전문학사)</p>
-                    <p class="text-xs text-muted-foreground">2020.03 ~ 2026.02</p>
-                  </div>
-                  <div class="relative pl-4 border-l-2 border-muted-foreground/20">
-                    <div class="absolute -left-[5px] top-1.5 w-2.5 h-2.5 rounded-full bg-muted-foreground"></div>
-                    <h3 class="font-bold text-base">인하공업전문대학</h3>
-                    <p class="text-sm font-medium text-muted-foreground">컴퓨터정보과 (공학사) (4년제 과정)</p>
-                    <p class="text-xs text-muted-foreground">2026.03 ~ 2027.02 (예정)</p>
-                  </div>
                 </div>
               </div>
               <div>
-                <h2 class="text-xl font-bold mb-4 uppercase border-l-4 border-foreground pl-3">Certification</h2>
-                <div class="space-y-3 text-sm border-t border-border pt-2 text-muted-foreground">
-                  <div class="flex justify-between border-b border-border pb-1">
-                    <span>
-                      <span class="font-semibold text-foreground">정보처리기사</span>
-                      <span class="text-xs text-muted-foreground/60 ml-1.5">한국산업인력공단</span>
-                    </span>
-                    <span>2026.09</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="space-y-8">
-              <div>
-                <h2 class="text-xl font-bold mb-4 uppercase border-l-4 border-foreground pl-3">Skills & Tools</h2>
-                <div class="space-y-5">
-                  <div>
-                    <h3 class="text-sm font-bold text-muted-foreground mb-2">Backend</h3>
-                    <div class="flex flex-wrap gap-2">
-                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
-                        <img :src="javaIcon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">Java <span class="text-green-600 font-bold">(상)</span></span>
-                      </span>
-                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
-                        <img :src="springIcon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">Spring Boot <span class="text-blue-600 font-bold">(중)</span></span>
-                      </span>
-                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
-                        <img :src="pythonIcon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">Python <span class="text-blue-600 font-bold">(중)</span></span>
-                      </span>
+                <h2 class="text-xl font-bold mb-2 uppercase border-l-4 border-foreground pl-3">Certification</h2>
+                <div class="border-t border-border pt-2">
+                  <div class="border-b border-border pb-1.5">
+                    <div class="flex justify-between items-baseline">
+                      <span class="text-sm font-semibold text-foreground">정보처리기사</span>
+                      <span class="text-sm text-muted-foreground">2026.09</span>
                     </div>
-                  </div>
-                  <div>
-                    <h3 class="text-sm font-bold text-muted-foreground mb-2">Frontend</h3>
-                    <div class="flex flex-wrap gap-2">
-                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
-                        <img :src="html5Icon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">HTML5 <span class="text-blue-600 font-bold">(중)</span></span>
-                      </span>
-                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
-                        <img :src="css3Icon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">CSS3 <span class="text-blue-600 font-bold">(중)</span></span>
-                      </span>
-                    </div>
-                  </div>
-                  <div>
-                    <h3 class="text-sm font-bold text-muted-foreground mb-2">Database</h3>
-                    <div class="flex flex-wrap gap-2">
-                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
-                        <img :src="mysqlIcon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">MySQL <span class="text-green-600 font-bold">(상)</span></span>
-                      </span>
-                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
-                        <img :src="oracleIcon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">Oracle <span class="text-yellow-600 font-bold">(하)</span></span>
-                      </span>
-                    </div>
-                  </div>
-                  <div>
-                    <h3 class="text-sm font-bold text-muted-foreground mb-2">DevOps &amp; Cloud</h3>
-                    <div class="flex flex-wrap gap-2">
-                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
-                        <img :src="gitIcon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">Git <span class="text-green-600 font-bold">(상)</span></span>
-                      </span>
-                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
-                        <img :src="githubIcon" class="w-4 h-4 inline-block align-middle mr-1.5 dark:invert"/><span class="align-middle">GitHub <span class="text-green-600 font-bold">(상)</span></span>
-                      </span>
-                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
-                        <img :src="awsIcon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">AWS <span class="text-blue-600 font-bold">(중)</span></span>
-                      </span>
-                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
-                        <img :src="dockerIcon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">Docker <span class="text-blue-600 font-bold">(중)</span></span>
-                      </span>
-                      <span class="inline-block px-3 py-1.5 rounded-full border text-xs font-semibold border-border text-foreground whitespace-nowrap leading-none">
-                        <img :src="k8sIcon" class="w-4 h-4 inline-block align-middle mr-1.5"/><span class="align-middle">Kubernetes <span class="text-blue-600 font-bold">(중)</span></span>
-                      </span>
-                    </div>
+                    <p class="text-xs text-muted-foreground/70 mt-0.5">한국산업인력공단</p>
                   </div>
                 </div>
               </div>
@@ -642,7 +680,7 @@ const prevScreenshot = () => {
       </section>
 
       <section id="about" :ref="sectionRefs.about" class="py-16 flex justify-center px-4">
-        <div class="a4-page bg-background text-foreground p-12 flex flex-col gap-10 max-w-[794px] w-full min-h-[1123px] relative overflow-hidden mx-auto box-border rounded-sm">
+        <div class="a4-page bg-background text-foreground p-10 flex flex-col gap-8 max-w-[794px] w-full min-h-[1123px] relative overflow-hidden mx-auto box-border rounded-sm">
           <div class="border-b border-border pb-4">
             <h2 class="text-3xl font-bold">About Me</h2>
           </div>
@@ -650,31 +688,40 @@ const prevScreenshot = () => {
           <div class="space-y-4">
             <h3 class="text-xl font-bold text-primary flex items-center gap-2">
               <span class="w-2 h-8 bg-primary rounded-full inline-block"></span>
-              나의 여정
+              리눅스를 먼저 만났습니다
             </h3>
-            <p class="text-sm leading-7 text-muted-foreground text-justify">
-              클라우드·컨테이너를 서비스 위에서 다뤄봤고, 지금은 리눅스 서버 밑바닥까지 직접 구축하며 이해하는 인프라 엔지니어입니다. AWS 서버리스 인프라를 팀 리드로 단독 설계·배포했고, 쿠버네티스 오토스케일링을 학회 논문 수준으로 실험·검증했습니다.
+            <p class="text-sm leading-7 text-muted-foreground">
+              전공 수업에서 리눅스 서버를 처음 다뤘습니다. 패키지를 설치하고 서비스를 올리고 로그를 읽는 순서를 그때 익혔습니다.
             </p>
           </div>
 
           <div class="space-y-4">
             <h3 class="text-xl font-bold text-primary flex items-center gap-2">
               <span class="w-2 h-8 bg-primary rounded-full inline-block"></span>
-              기술과 도전
+              클라우드를 쓰면서 밑단이 비어 있다는 걸 알았습니다
             </h3>
-            <p class="text-sm leading-7 text-muted-foreground text-justify">
-              이후 5인 팀 프로젝트에서 AWS Lambda 35개 규모의 서버리스 백엔드 인프라를 단독으로 설계·배포하며 클라우드 운영을 깊이 경험했고, Kubernetes 오토스케일링을 ML로 개선하는 연구를 단독으로 수행해 한국컴퓨터정보학회(KSCI)에 논문을 투고했습니다. 그 밖에 컴퓨터 비전 수업에서 학우 29명이 사용하는 AWS 실습 환경의 구축과 운영을 돕기도 하며, 여러 사용자가 함께 쓰는 클라우드 환경을 다뤄봤습니다. 이 과정에서 '문제를 코드로만 푸는 것'과 '시스템 전체 관점에서 푸는 것'의 차이를 체감했습니다.
+            <p class="text-sm leading-7 text-muted-foreground">
+              이후 클라우드를 배우며 AWS 위에 여러 서비스를 올렸습니다. Lambda 35개와 DynamoDB 7테이블 규모의 서버리스 백엔드를 5인 팀에서 단독으로 설계·운영했습니다. 그런데 관리형 서비스가 대신 처리해주던 부분이 정확히 무엇인지 설명할 수 없었습니다. 로드밸런서가 어떻게 세션을 넘기는지, 복제가 어디서 깨지는지 모른 채 쓰고 있었습니다.
             </p>
           </div>
 
           <div class="space-y-4">
             <h3 class="text-xl font-bold text-primary flex items-center gap-2">
               <span class="w-2 h-8 bg-primary rounded-full inline-block"></span>
-              미래로의 도약
+              그래서 직접 쌓아 올렸습니다
             </h3>
-            <p class="text-sm leading-7 text-muted-foreground text-justify">
-              학교에서 쌓은 경험은 엔지니어로서의 토대가 되었지만, 실무의 인프라 규모와 안정성 요구는 또 다른 차원임을 알고 있습니다. <br/><br/>
-              앞으로는 학교라는 울타리를 넘어 현장에서 직접 부딪히며 실전 경험을 쌓고 싶습니다. 빠른 결과만을 추구하기보다 시행착오 속에서 시스템의 근본을 이해하고, 부족한 점을 스스로 파악해 채워 나가겠습니다. 스스로 고민하고 해결하는 과정을 소중한 자산으로 여기며, 안정적인 시스템을 만드는 백엔드·클라우드 엔지니어로 한 걸음씩 단단하게 전진하겠습니다.
+            <p class="text-sm leading-7 text-muted-foreground">
+              Rocky Linux 9 VM 7대로 로드밸런서–웹–DB 3계층을 분리 구축했습니다. HAProxy L7 헬스체크로 백엔드를 자동 제외시키고, Keepalived VRRP로 VIP를 이중화하고, PostgreSQL 스트리밍 복제와 LVM 전용 볼륨을 붙였습니다. 전 구성은 Ansible 롤로 코드화해 단일 명령으로 재현됩니다. 이중화는 "구성했다"와 "실제로 넘어가는 것을 봤다"가 다릅니다. MASTER 노드를 강제 종료하고 1초 간격 curl 루프로 측정해서야 다운타임이 약 1초라는 것을 알 수 있었습니다.
+            </p>
+          </div>
+
+          <div class="space-y-4">
+            <h3 class="text-xl font-bold text-primary flex items-center gap-2">
+              <span class="w-2 h-8 bg-primary rounded-full inline-block"></span>
+              로그를 따라 원인을 좁히는 일이 적성에 맞습니다
+            </h3>
+            <p class="text-sm leading-7 text-muted-foreground">
+              설정은 정상인데 복제 접속이 계속 거부된 적이 있습니다. 인증 방식을 trust로, 주소를 0.0.0.0/0으로, 접속 출발지를 자기 자신으로 하나씩 바꿔 인증·범위·네트워크 세 계층을 배제하고 나서야 설정 파일 자체의 손상으로 원인을 특정했습니다. 고치고 끝내는 대신 재발 지점을 코드로 막습니다. 파괴적 task에는 멱등성 가드를 넣었고, 트러블슈팅은 증상 → 로그 확인 → 근본 원인 → 복구 절차 구조로 문서에 남깁니다.
             </p>
           </div>
         </div>
@@ -706,6 +753,10 @@ const prevScreenshot = () => {
                 </div>
                 <div class="p-6 flex-grow flex flex-col justify-between">
                   <h3 class="text-xl font-semibold mb-2">{{ project.title }}</h3>
+                  <div v-if="project.period" class="flex flex-wrap items-center gap-2 mb-2">
+                    <span class="text-xs text-muted-foreground">{{ project.period }}</span>
+                    <span v-if="project.status" class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[11px] font-bold">{{ project.status }}</span>
+                  </div>
                   <p class="text-muted-foreground text-sm mb-4 line-clamp-3">{{ project.description }}</p>
                   <div class="flex flex-wrap gap-2 mt-auto">
                     <span v-for="tech in project.tech" :key="tech" class="px-2 py-1 rounded-full border border-border bg-secondary/50 text-xs">
@@ -724,7 +775,7 @@ const prevScreenshot = () => {
           <div class="mb-10">
             <h2 class="text-4xl font-bold mb-4">Get In Touch</h2>
             <p class="text-muted-foreground max-w-2xl mx-auto">
-              새로운 기회와 도전을 언제나 환영합니다. 궁금한 점이 있거나 협업 제안이 있다면 언제든 연락주세요.
+              신입 시스템·인프라 엔지니어로 지원 중입니다. 채용 관련 연락 환영합니다.
             </p>
           </div>
           <div class="flex flex-col md:flex-row justify-center items-center gap-6">
@@ -740,7 +791,7 @@ const prevScreenshot = () => {
 
       <footer class="py-8 border-t border-border bg-background">
         <div class="container mx-auto text-center text-sm text-muted-foreground">
-          <p>© 2025 Park Tae-joon. Created with Vue.js & Tailwind CSS.</p>
+          <p>© 2026 Park Tae-joon. Created with Vue.js & Tailwind CSS.</p>
         </div>
       </footer>
 
@@ -755,11 +806,15 @@ const prevScreenshot = () => {
             <div class="flex-1 overflow-y-auto p-6 md:p-8">
               <div class="mb-6">
                 <h2 class="text-3xl font-bold mb-2">{{ selectedProject.title }}</h2>
+                <div v-if="selectedProject.period" class="flex flex-wrap items-center gap-2 mb-2">
+                  <span class="text-sm text-muted-foreground">{{ selectedProject.period }}</span>
+                  <span v-if="selectedProject.status" class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-bold">{{ selectedProject.status }}</span>
+                </div>
                 <div class="text-base flex flex-wrap gap-4 items-center mt-2 text-muted-foreground">
-                  <a :href="selectedProject.github" target="_blank" class="flex items-center gap-1 hover:text-primary transition-colors">
+                  <a v-if="selectedProject.github" :href="selectedProject.github" target="_blank" class="flex items-center gap-1 hover:text-primary transition-colors">
                     <Github class="w-4 h-4" /> GitHub
                   </a>
-                  <span v-if="selectedProject.notion" class="hidden md:inline">|</span>
+                  <span v-if="selectedProject.github && selectedProject.notion" class="hidden md:inline">|</span>
                   <a v-if="selectedProject.notion" :href="selectedProject.notion" target="_blank" class="flex items-center gap-1 hover:text-primary transition-colors">
                     <img :src="notionImage" class="w-4 h-4" alt="notion" /> Notion
                   </a>
@@ -826,6 +881,7 @@ const prevScreenshot = () => {
                       <div class="pl-2 border-l-2 border-green-500/50">
                         <span class="inline-block bg-green-100 text-green-600 text-xs font-bold px-2 py-1 rounded mb-1">Solution</span>
                         <p class="text-sm text-muted-foreground leading-relaxed">{{ ts.solution }}</p>
+                        <pre v-if="ts.code" class="mt-3 p-3 rounded-md bg-slate-900 text-slate-100 text-xs leading-relaxed overflow-x-auto"><code>{{ ts.code }}</code></pre>
                       </div>
                     </div>
                   </div>
@@ -854,6 +910,8 @@ const prevScreenshot = () => {
 body {
   font-family: var(--font-sans);
   font-weight: 400;
+  /* 한글이 어절 중간에서 끊기지 않도록 (예: "약 1 / 초") */
+  word-break: keep-all;
 }
 
 .fade-enter-active,
