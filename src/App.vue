@@ -38,6 +38,11 @@ import smartstudyImage3 from './assets/images/smartstudy_architecture.png'
 import smartstudyImage4 from './assets/images/smartstudy_erd.png'
 import smartstudyImage5 from './assets/images/smartstudy_google_login.png'
 import onpremImage from './assets/images/onprem_3tier.svg'
+import holdfastImage from './assets/images/holdfast_aws.svg'
+import hfHarness from './assets/images/hf-measurement-harness.svg'
+import hfOversell from './assets/images/hf-m3-oversell-by-contention.svg'
+import hfPageTiming from './assets/images/hf-per002-page-timing.svg'
+import hfReqCoverage from './assets/images/hf-requirements-coverage.svg'
 import ksciImage1 from './assets/images/fig1.png'
 import ksciImage2 from './assets/images/fig2.png'
 import ksciImage3 from './assets/images/fig4.png'
@@ -48,6 +53,7 @@ import linuxIcon from './assets/icons/linux-original.png'
 import bashIcon from './assets/icons/bash-original.png'
 import nginxIcon from './assets/icons/nginx-original.png'
 import ansibleIcon from './assets/icons/ansible-original.png'
+import terraformIcon from './assets/icons/terraform-original.png'
 import prometheusIcon from './assets/icons/prometheus-original.png'
 import grafanaIcon from './assets/icons/grafana-original.png'
 import postgresIcon from './assets/icons/postgresql-original.png'
@@ -80,6 +86,7 @@ const skillGroups = [
   {
     category: 'Automation & Monitoring',
     items: [
+      { name: 'Terraform', level: '초', icon: terraformIcon },
       { name: 'Ansible', level: '초', icon: ansibleIcon, invert: true },
       { name: 'Prometheus', level: '초', icon: prometheusIcon },
       { name: 'Grafana', level: '초', icon: grafanaIcon }
@@ -176,6 +183,92 @@ const projects = [
         }
       ],
       screenshots: [onpremImage]
+    }
+  },
+  {
+    featured: true,
+    title: "HoldFast — 좌석 예약 시스템 AWS 배포 인프라",
+    period: "2026.08 ~ 진행 중 · 2인 졸업작품 · 인프라·배포 전담",
+    description: "공공기관 RFP 기반 좌석 예약 시스템의 AWS 인프라를 Terraform으로 전 구성 코드화. VPC 2AZ·ALB·ECS Fargate 2대·RDS를 배포하고, 잘못된 apply를 사람 판단이 아니라 스크립트가 막도록 가드레일을 코드로 박음. 내린 뒤 잔여 과금 0 실측",
+    tech: ["Terraform", "AWS ECS Fargate", "ALB", "RDS PostgreSQL", "VPC 2AZ", "ACM", "SSM", "CloudWatch"],
+    image: holdfastImage,
+    github: "https://github.com/inhalab/holdfast",
+    notion: "",
+    details: {
+      overview: "2인 졸업작품(2026.08.31 착수, 12.07 최종 발표 예정)의 AWS 배포·운영 구간 전담. 주제 선정 기준은 「정량 검수 기준이 있는가」였고, ‘정원 초과 승인 0건’·‘화면 응답 3초 이내’처럼 주관적 평가가 아니라 측정으로 답할 수 있는 조건이 명시된 공공기관 제안요청서(RFP)를 골랐음. 그 결과 목표가 ‘기능을 다 만든다’가 아니라 ‘동시성 제어가 됐다는 증거를 만든다’가 됨. 좌석 예약은 같은 자원(좌석 1석)에 여러 요청이 몰리는 구조라 그 증거를 만들기 좋은 도메인. 역할은 동시성 코어를 팀원이 맡고, 본인은 화면 계층과 인프라·배포·운영을 전담함. Terraform으로 VPC 2AZ부터 ALB·ECS Fargate·RDS까지 전 구성을 코드화하고, 잘못된 apply를 사람 판단이 아니라 단일 진입점 스크립트가 막도록 가드레일을 코드로 박았음. 검증 과정에서 teardown 판정 기준·state 밖 리소스·검증 도구 무동작 등 「틀린 것을 찾아 고친 기록」이 남았고, 내린 뒤 잔여 과금 0을 실측으로 확인함. RFP의 정량 조건은 숫자로 답함 — 초과 예약 0건(락 전략 4종 36회 전부 0), 응답시간 p95 3초 이내(API 18~41ms), 본인이 담당한 화면 13개 중 가장 느린 화면 45.9ms. 미완 — 엣지와 애플리케이션이 동시에 떠 있는 상태로는 아직 통합 검증하지 않았고(두 구간을 따로 확인), 모니터링·알림 체계가 없으며 단일 리전·단일 환경, CI에서 apply는 하지 않음.",
+      features: [
+        "Terraform으로 전 구성 코드화 — VPC 2AZ 퍼블릭 서브넷 · ALB(HTTPS) · ECS Fargate · RDS PostgreSQL · ACM 와일드카드 인증서 · SSM Parameter Store · ECR(수명주기 정책) · CloudWatch Logs",
+        "앱 2대 구성 — 태스크 정의 1개에 desired_count 2. 각 태스크가 메타데이터에서 자기 ID를 읽어 화면에 표시해 ‘정말 2대인가’를 눈으로 확인 가능하게 함. 1대면 애플리케이션 내부 락만으로도 초과 확정 0이 나와 프로젝트 결론이 서지 않기 때문",
+        "설계 판단 ① NAT Gateway 안 세움 — 퍼블릭 서브넷 구성이면 불필요하므로 만들지 않음. 대가로 보안그룹이 유일한 방어선이 됨",
+        "설계 판단 ② ALB를 인터넷 전체에 열지 않음 — CDN 게시 대역만 허용하고, 대역 목록은 apply 시점에 API로 받아옴(하드코딩 안 함). 직행 경로가 열리면 엣지에 둔 관리자 인증이 무의미해지기 때문",
+        "설계 판단 ③ 헬스체크에 /actuator 안 씀 — 로컬에서 이 앱의 /actuator/health가 캐시 미사용 시 503을 낸다는 것을 먼저 실측함. 배포 구성에는 캐시 계층이 없으므로 그대로 쓰면 앱은 정상인데 전 타겟이 unhealthy가 됨. /api/health로 고정(200을 내고 의존성 상태는 본문에 실음). 겪고 고친 게 아니라, 다른 환경에서 잰 값을 근거로 미리 피한 경우",
+        "설계 판단 ④ 캐시 계층 안 세움 — 시연 구성과 배포 구성을 같게 유지하기 위해 배포 쪽에도 캐시를 두지 않음",
+        "엣지 보안 — 관리자 서브도메인을 CDN의 Zero Trust로 보호하되 애플리케이션은 그 인증을 모름(인증 로직이 앱에 들어가지 않음). TLS는 엣지↔오리진 구간까지 암호화, 와일드카드 인증서 1장으로 검증 레코드를 1개로 축소",
+        "계정 경계 설계 — 도메인·Zero Trust는 팀원 계정, AWS 리소스는 본인 계정. 서로를 IAM에 초대하는 대신 「DNS 레코드 쓰기」만 가능한 최소 권한 토큰을 받아 Terraform이 DNS를 직접 관리 → 배포마다 사람을 기다리던 단계 제거",
+        "운영 스크립트에 가드레일을 코드로 박음(단일 진입점 셸) — 지정한 IAM 사용자가 아니면 apply 거부 / plan에 NAT Gateway가 있으면 apply 거부 / 임시 접근 구멍이 plan에 있으면 멈추고 사람이 확인 문구를 직접 입력해야 통과 / 무과금 구간 → DB → 엣지 → 전체 단계별 apply로 앞단이 틀리면 비싼 것을 세우기 전에 드러나게 함 / 비용 시계를 apply 이전에 시작",
+        "비용 통제 — 학생 크레딧 수령 경로 3개를 모두 확인해 전부 해당 없음을 확인하고 실비 집행. 예산 경보는 갱신 지연이 8~12시간이라 실시간 방어가 아님을 확인하고 즉시 teardown을 유일한 통제 수단으로 설계. 실측 전체 스택 검증 0.4시간 / 엣지 구간 검증 0.1시간, 각각 $0.1 미만, 내린 뒤 잔여 과금 0",
+        "검수 기준을 숫자로 마감 — 요구사항 14개를 추적표로 관리해 충족 10건·부분 4건까지 상태를 공개. 초과 예약 0건(REQ-01)은 락 전략 4종 36회 측정에서 전부 0, 락이 없는 베이스라인은 극단 경합에서 3~5건 발생해 대조군이 성립. 응답시간 p95 3초 이내(REQ-10)는 API 18~41ms. 본인이 맡은 화면 계층은 화면 13개 중 가장 느린 화면이 45.9ms로 기준 3000ms의 1.5%",
+        "기반·측정 설계(팀 공통 구간) — 저장소·CI·설계 문서·역할 경계를 착수 당일 세우고 CODEOWNERS로 리뷰 책임을 경로 단위 분할. 락이 없는 베이스라인을 먼저 완성해 좌석 10석에 500명이 붙을 때 정원을 넘겨 확정되는 것을 3회 측정으로 재현한 뒤, 락 전략 4종을 환경변수 하나로 전환되게 인터페이스 뒤에 배치해 전략 5종 × 경합도 3단계 × 3회 = 60회 비교 측정 (동시성 코어 구현은 팀원 담당)"
+      ],
+      techStack: [
+        "Terraform",
+        "AWS ECS Fargate",
+        "ALB (HTTPS)",
+        "Amazon RDS PostgreSQL",
+        "VPC (2AZ 퍼블릭 서브넷)",
+        "ACM (와일드카드 인증서)",
+        "SSM Parameter Store",
+        "ECR (수명주기 정책)",
+        "CloudWatch Logs",
+        "CDN Zero Trust (엣지 인증)",
+        "Shell Script (배포 가드레일)",
+        "Spring Boot 4.1 / Java 25",
+        "Thymeleaf + htmx (화면 계층)",
+        "k6 (부하 측정)"
+      ],
+      troubleshooting: [
+        {
+          id: "T-1",
+          problem: "다 내렸는데 teardown 검증이 실패로 끝났다",
+          symptom: "리소스를 전부 제거했는데 검증 스크립트가 「남아 있음」으로 판정.",
+          cause: "판정을 태그 조회로 했다. 과금되지 않는 잔여 객체가 태그에 잡혔고, 태그 API 자체에도 갱신 지연이 있었다.",
+          action: "판정 기준을 「태그가 비었나」에서 「과금되는 리소스가 있나」로 바꾸고, 태그나 Terraform state를 믿지 않고 AWS에 직접 질의해 세도록 수정.",
+          rule: "정리 검증은 「깨끗해 보이나」가 아니라 「돈이 나가나」로 판정한다. 중간 표현(태그·state)을 믿으면 둘 다 틀릴 수 있다."
+        },
+        {
+          id: "T-2",
+          problem: "apply를 중단하자 Terraform이 모르는 리소스가 남았다",
+          symptom: "생성 중 중단한 뒤 destroy를 돌렸는데 DB 인스턴스가 그대로 살아 있었다.",
+          cause: "리소스는 생성됐지만 state에 기록되기 전에 프로세스가 끊겼다. state에 없으니 destroy의 대상이 아니다.",
+          action: "CLI로 직접 삭제하고 잔여 과금 없음을 다시 확인. 이 잔여물을 발견한 수단이 바로 앞 T-1에서 바꿔 둔 판정 방식이었다. 앞의 수정이 없었으면 과금이 계속됐을 것이다.",
+          rule: "「destroy가 유일한 방어」라는 전제에는 선행 조건이 있다. apply가 정상 종료했을 때만 성립하며, 이 경로를 문서에 명시했다."
+        },
+        {
+          id: "T-3",
+          problem: "단계별 apply가 전체 apply에 가려져 있던 의존성 누락을 드러냈다",
+          symptom: "단계를 나눠 올리면 ① 요청이 오류도 없이 무응답 ② 인증서 검증이 10분 뒤 타임아웃 ③ 외부로 나가는 경로가 없음 — 증상이 매번 달랐다.",
+          cause: "보안그룹 규칙·라우트 테이블 연결·인증서 검증용 DNS 레코드가 의존 그래프상 어느 리소스에서도 참조되지 않는 노드였다. 부분 대상 지정이 이들을 통째로 빼 버린다. 전체 apply에서는 우연히 순서가 맞아 드러나지 않았다.",
+          action: "해당 단계가 네트워크 계층을 통째로 포함하도록 범위를 재정의하고, 누락되던 리소스에는 명시적 의존을 선언.",
+          rule: "전체 apply가 성공한다고 의존 관계가 선언된 것은 아니다. 부분 배포는 기능이 아니라 의존성 선언이 맞는지 검사하는 수단이다."
+        },
+        {
+          id: "T-4",
+          problem: "검증 도구가 통과했는데 아무것도 검사하지 않았다 (3회)",
+          symptom: "검사 명령이 성공으로 끝났지만 대상이 0건이라 실제로는 아무 판정도 하지 않았다. 세 군데에서 같은 형태로 발견.",
+          cause: "「위반 0건」과 「검사 대상 0건」이 같은 결과로 떨어지는 구조.",
+          action: "0건 확인을 실패로 처리하도록 변경. 더해서 위반을 일부러 심고 롤백하는 자가검증 쿼리를 만들어, 검사가 그것을 실제로 잡는지 먼저 확인.",
+          rule: "검사가 통과하면 「무엇이 통과했나」보다 「검사가 돌기는 했나」를 먼저 의심한다. 통과는 두 가지를 뜻할 수 있고 둘은 정반대다."
+        },
+        {
+          id: "T-5",
+          problem: "내가 쓴 문서의 사실관계가 틀렸고, 팀원 리뷰가 잡았다",
+          symptom: "인프라 문서에 「암호화되지 않은 구간이 있었다」고 적었는데 팀원이 리뷰에서 시제를 지적.",
+          cause: "커밋 이력을 확인하지 않고 현재 구성만 보고 과거형으로 썼다. 실제로는 해당 경로가 생긴 시점과 암호화가 적용된 시점이 같았다. 그 구간으로 평문 트래픽이 지난 적이 없다.",
+          action: "커밋 이력으로 두 시점을 확인해 정정. 지우지 않고 회수 기록으로 남김.",
+          rule: "문서도 코드와 같은 기준으로 근거를 댄다. 틀린 서술은 삭제가 아니라 회수로 처리한다. 무엇을 왜 잘못 알았는지가 남아야 같은 실수를 막는다."
+        }
+      ],
+      screenshots: [holdfastImage, hfHarness, hfOversell, hfPageTiming, hfReqCoverage]
     }
   },
   {
@@ -872,15 +965,45 @@ const prevScreenshot = () => {
                   <h3 class="text-xl font-bold mb-4 border-l-4 border-primary pl-3">트러블 슈팅</h3>
                   <div class="space-y-6">
                     <div v-for="(ts, i) in selectedProject.details.troubleshooting" :key="i" class="bg-secondary/20 p-5 rounded-lg border border-border/50">
-                      <div class="mb-3">
-                        <span class="inline-block bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded mb-1">Problem</span>
-                        <p class="font-medium">{{ ts.problem }}</p>
-                      </div>
-                      <div class="pl-2 border-l-2 border-green-500/50">
-                        <span class="inline-block bg-green-100 text-green-600 text-xs font-bold px-2 py-1 rounded mb-1">Solution</span>
-                        <p class="text-sm text-muted-foreground leading-relaxed">{{ ts.solution }}</p>
-                        <pre v-if="ts.code" class="mt-3 p-3 rounded-md bg-slate-900 text-slate-100 text-xs leading-relaxed overflow-x-auto"><code>{{ ts.code }}</code></pre>
-                      </div>
+
+                      <!-- 증상 → 원인 → 조치 → 규칙 구조 (사고 기록) -->
+                      <template v-if="ts.rule">
+                        <div class="flex items-baseline gap-2 mb-4 pb-3 border-b border-border/60">
+                          <span v-if="ts.id" class="shrink-0 px-2 py-0.5 rounded bg-primary/10 text-primary text-xs font-bold">{{ ts.id }}</span>
+                          <p class="font-bold">{{ ts.problem }}</p>
+                        </div>
+                        <dl class="space-y-3 text-sm">
+                          <div class="grid grid-cols-[3.5rem_1fr] gap-x-3">
+                            <dt class="text-xs font-bold text-red-600 dark:text-red-400 pt-0.5">증상</dt>
+                            <dd class="text-muted-foreground leading-relaxed">{{ ts.symptom }}</dd>
+                          </div>
+                          <div class="grid grid-cols-[3.5rem_1fr] gap-x-3">
+                            <dt class="text-xs font-bold text-amber-600 dark:text-amber-400 pt-0.5">원인</dt>
+                            <dd class="text-muted-foreground leading-relaxed">{{ ts.cause }}</dd>
+                          </div>
+                          <div class="grid grid-cols-[3.5rem_1fr] gap-x-3">
+                            <dt class="text-xs font-bold text-green-600 dark:text-green-400 pt-0.5">조치</dt>
+                            <dd class="text-muted-foreground leading-relaxed">{{ ts.action }}</dd>
+                          </div>
+                          <div class="grid grid-cols-[3.5rem_1fr] gap-x-3 pt-2 border-t border-border/50">
+                            <dt class="text-xs font-bold text-primary pt-0.5">규칙</dt>
+                            <dd class="font-medium leading-relaxed">{{ ts.rule }}</dd>
+                          </div>
+                        </dl>
+                      </template>
+
+                      <!-- 기존 Problem / Solution 구조 -->
+                      <template v-else>
+                        <div class="mb-3">
+                          <span class="inline-block bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded mb-1">Problem</span>
+                          <p class="font-medium">{{ ts.problem }}</p>
+                        </div>
+                        <div class="pl-2 border-l-2 border-green-500/50">
+                          <span class="inline-block bg-green-100 text-green-600 text-xs font-bold px-2 py-1 rounded mb-1">Solution</span>
+                          <p class="text-sm text-muted-foreground leading-relaxed">{{ ts.solution }}</p>
+                          <pre v-if="ts.code" class="mt-3 p-3 rounded-md bg-slate-900 text-slate-100 text-xs leading-relaxed overflow-x-auto"><code>{{ ts.code }}</code></pre>
+                        </div>
+                      </template>
                     </div>
                   </div>
                 </div>
