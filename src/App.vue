@@ -51,7 +51,6 @@ import ansibleIcon from './assets/icons/ansible-original.png'
 import prometheusIcon from './assets/icons/prometheus-original.png'
 import grafanaIcon from './assets/icons/grafana-original.png'
 import postgresIcon from './assets/icons/postgresql-original.png'
-import mariadbIcon from './assets/icons/mariadb-original.png'
 import mysqlIcon from './assets/icons/mysql-original.png'
 import awsIcon from './assets/icons/amazonwebservices-original-wordmark.png'
 import dockerIcon from './assets/icons/docker-original.png'
@@ -74,14 +73,14 @@ const skillGroups = [
     category: 'High Availability',
     items: [
       { name: 'HAProxy', level: '중' },
-      { name: 'Keepalived / VRRP', level: '중' },
-      { name: 'Nginx', level: '중', icon: nginxIcon }
+      { name: 'Keepalived / VRRP', level: '초' },
+      { name: 'Nginx', level: '초', icon: nginxIcon }
     ]
   },
   {
     category: 'Automation & Monitoring',
     items: [
-      { name: 'Ansible', level: '중', icon: ansibleIcon, invert: true },
+      { name: 'Ansible', level: '초', icon: ansibleIcon, invert: true },
       { name: 'Prometheus', level: '초', icon: prometheusIcon },
       { name: 'Grafana', level: '초', icon: grafanaIcon }
     ]
@@ -89,9 +88,8 @@ const skillGroups = [
   {
     category: 'Database',
     items: [
-      { name: 'PostgreSQL 스트리밍 복제', level: '중', icon: postgresIcon },
-      { name: 'MySQL', level: '초', icon: mysqlIcon },
-      { name: 'MariaDB', level: '초', icon: mariadbIcon, invert: true }
+      { name: 'PostgreSQL 스트리밍 복제', level: '초', icon: postgresIcon },
+      { name: 'MySQL', level: '초', icon: mysqlIcon }
     ]
   },
   {
@@ -149,7 +147,7 @@ const projects = [
     details: {
       overview: "관리형 서비스가 대신 처리해주던 계층을 직접 만들어보기 위해 Rocky Linux 9 VM 7대로 로드밸런서–웹–DB 3계층을 분리 구축한 개인 프로젝트. 계층별 이중화를 하나씩 붙이고, 구성했다고 끝내는 대신 실제로 노드를 죽여 전환과 다운타임을 측정하는 것을 원칙으로 함. 전 구성을 Ansible 롤로 코드화해 단일 명령으로 재현 가능하도록 만들었고, SELinux를 enforcing으로 유지한 상태에서 구축을 완료함. 기반 구축 · 웹 계층 · 로드밸런서 이중화 · DB 복제까지 구성을 마쳤고, 자동 백업·복구와 모니터링(Prometheus/Grafana/Loki), 네트워크 분리를 다음 단계로 확장하고 있음.",
       features: [
-        "HAProxy L7 로드밸런싱 + 헬스체크로 백엔드 자동 장애 제외 구성, 웹 서버 1대 정지 시 무중단 서비스 검증",
+        "HAProxy L7(HTTP) 로드밸런싱 + HTTP 헬스체크(option httpchk)로 백엔드 자동 장애 제외 구성, 웹 서버 1대 정지 시 무중단 서비스 검증",
         "Keepalived VRRP 기반 VIP 페일오버 구성, MASTER 노드 강제 종료 시 실측 다운타임 약 1초 확인 (1초 간격 curl 루프로 측정)",
         "PostgreSQL 스트리밍 복제(primary/replica) 구성 및 LVM 전용 데이터 볼륨 분리로 OS 파티션과 격리",
         "전 구성을 Ansible 롤로 코드화. host_vars 기반 역할 분기로 동일 롤에서 MASTER/BACKUP, primary/replica를 구분 배포",
@@ -158,7 +156,7 @@ const projects = [
       ],
       techStack: [
         "Rocky Linux 9",
-        "HAProxy (L7 + 헬스체크)",
+        "HAProxy (L7 · option httpchk)",
         "Keepalived (VRRP / VIP)",
         "Nginx",
         "PostgreSQL (스트리밍 복제)",
@@ -240,7 +238,7 @@ const projects = [
   },
   {
     title: "ML 기반 Kubernetes 사전 오토스케일링 — 트래픽 Archetype별 예측 스케일러 평가",
-    description: "KSCI 투고 · 단독 집필. LSTM/GRU/앙상블 vs HPA 84회 실험, 리드타임 측정 도구 자체 개발로 'No Universal Winner' 실증",
+    description: "KSCI 투고 예정 · 단독 집필. LSTM/GRU/앙상블 vs HPA 84회 실험, 리드타임 측정 도구 자체 개발로 'No Universal Winner' 실증",
     tech: ["Kubernetes", "HPA", "TensorFlow", "FastAPI", "LSTM/GRU", "Prometheus"],
     image: ksciImage1,
     github: "https://github.com/F3ZLoV/ML-based-Kubernetes-Pre-AutoScaling/tree/dev",
@@ -610,7 +608,7 @@ const prevScreenshot = () => {
           <div>
             <h2 class="text-xl font-bold mb-2 uppercase border-l-4 border-foreground pl-3">Profile</h2>
             <p class="text-sm leading-7 text-muted-foreground">
-              Rocky Linux 9 VM 7대로 로드밸런서–웹–DB 3계층을 구축하고 HAProxy L7 헬스체크와 Keepalived VRRP로 이중화했습니다. MASTER 노드를 강제 종료해 VIP 페일오버 다운타임 약 1초를 실측했고, PostgreSQL 스트리밍 복제·LVM 분리·Ansible 롤 코드화까지 구성했습니다. AWS 서버리스 백엔드를 5인 팀에서 단독 설계·운영했고, Kubernetes 오토스케일링을 84회 실험으로 검증해 학회에 투고했습니다.
+              Rocky Linux 9 VM 7대로 로드밸런서–웹–DB 3계층을 구축하고, HAProxy L7(HTTP) 로드밸런싱·헬스체크와 Keepalived VRRP VIP 페일오버로 이중화했습니다. MASTER 노드를 강제 종료해 다운타임 약 1초를 실측했고, PostgreSQL 스트리밍 복제·LVM 분리·Ansible 롤 코드화까지 구성했습니다. AWS 서버리스 백엔드를 5인 팀에서 단독 설계·운영했고, Kubernetes 오토스케일링을 84회 실험으로 검증해 KSCI에 투고 예정입니다.
             </p>
           </div>
 
@@ -775,7 +773,7 @@ const prevScreenshot = () => {
           <div class="mb-10">
             <h2 class="text-4xl font-bold mb-4">Get In Touch</h2>
             <p class="text-muted-foreground max-w-2xl mx-auto">
-              신입 시스템·인프라 엔지니어로 지원 중입니다. 채용 관련 연락 환영합니다.
+              신입 인프라 운영 엔지니어로 지원 중입니다. 채용 관련 연락을 환영합니다.
             </p>
           </div>
           <div class="flex flex-col md:flex-row justify-center items-center gap-6">
