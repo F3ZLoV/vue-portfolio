@@ -13,10 +13,15 @@
 
   <!-- ===== 헤더 ===== -->
   <text x="40" y="58" font-size="30" font-weight="700" fill="#f1f5f9">온프레미스 3-Tier 고가용성 인프라</text>
-  <text x="40" y="90" font-size="17" fill="#94a3b8">Rocky Linux 9 · VM 7대 · 전 구성 Ansible 코드화</text>
-  <text x="1160" y="58" font-size="17" text-anchor="end" fill="#94a3b8">2026.08 ~ 진행 중</text>
-  <rect x="1010" y="72" width="150" height="26" rx="13" fill="#38bdf8" fill-opacity="0.14" stroke="#38bdf8" stroke-opacity="0.5"/>
-  <text x="1085" y="90" font-size="14" font-weight="700" text-anchor="middle" fill="#7dd3fc">3계층 · 계층별 이중화</text>
+  <text x="40" y="90" font-size="17" fill="#94a3b8">Rocky Linux 9 · VM 7대 · Ansible 롤 13 · 플레이북 7</text>
+  <text x="1160" y="58" font-size="17" text-anchor="end" fill="#94a3b8">2026.08 ~ 2026.09 · 7주</text>
+
+  <rect x="700" y="72" width="152" height="26" rx="13" fill="#38bdf8" fill-opacity="0.14" stroke="#38bdf8" stroke-opacity="0.5"/>
+  <text x="776" y="90" font-size="13" font-weight="700" text-anchor="middle" fill="#7dd3fc">VIP 페일오버 ≈ 1초</text>
+  <rect x="862" y="72" width="140" height="26" rx="13" fill="#34d399" fill-opacity="0.14" stroke="#34d399" stroke-opacity="0.5"/>
+  <text x="932" y="90" font-size="13" font-weight="700" text-anchor="middle" fill="#6ee7b7">웹 1대 정지 무중단</text>
+  <rect x="1012" y="72" width="148" height="26" rx="13" fill="#a78bfa" fill-opacity="0.14" stroke="#a78bfa" stroke-opacity="0.5"/>
+  <text x="1086" y="90" font-size="13" font-weight="700" text-anchor="middle" fill="#c4b5fd">전 노드 changed=0</text>
 
   <line x1="40" y1="120" x2="1160" y2="120" stroke="#1e293b" stroke-width="2"/>
 
@@ -25,7 +30,7 @@
   <text x="215" y="222" font-size="15" font-weight="700" fill="#38bdf8">LOAD BALANCER · 이중화</text>
   <text x="465" y="222" font-size="15" font-weight="700" fill="#34d399">WEB TIER · 다중화</text>
   <text x="715" y="222" font-size="15" font-weight="700" fill="#fbbf24">DATABASE · 복제</text>
-  <text x="965" y="222" font-size="15" font-weight="700" fill="#a78bfa">실측 검증</text>
+  <text x="965" y="222" font-size="15" font-weight="700" fill="#a78bfa">MONITORING · 관측</text>
 
   <!-- ===== Client ===== -->
   <rect x="40" y="319" width="130" height="52" rx="8" fill="#1e293b" stroke="#475569"/>
@@ -39,27 +44,27 @@
 
   <rect x="229" y="286" width="172" height="52" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-opacity="0.6"/>
   <circle cx="245" cy="303" r="4" fill="#22c55e"/>
-  <text x="257" y="308" font-size="14" font-weight="700" fill="#e2e8f0">lb01 · MASTER</text>
+  <text x="257" y="308" font-size="14" font-weight="700" fill="#e2e8f0">lb1 · MASTER</text>
   <text x="240" y="327" font-size="12" fill="#94a3b8">HAProxy L7 + Keepalived</text>
 
   <rect x="229" y="362" width="172" height="52" rx="8" fill="#1e293b" stroke="#475569" stroke-dasharray="4 3"/>
   <circle cx="245" cy="379" r="4" fill="#64748b"/>
-  <text x="257" y="384" font-size="14" font-weight="700" fill="#cbd5e1">lb02 · BACKUP</text>
+  <text x="257" y="384" font-size="14" font-weight="700" fill="#cbd5e1">lb2 · BACKUP</text>
   <text x="240" y="403" font-size="12" fill="#94a3b8">standby · 자동 승격</text>
 
   <!-- ===== Web 그룹 ===== -->
   <rect x="465" y="230" width="200" height="200" rx="12" fill="#34d399" fill-opacity="0.04" stroke="#34d399" stroke-opacity="0.35"/>
   <rect x="479" y="242" width="172" height="30" rx="15" fill="#34d399" fill-opacity="0.16" stroke="#34d399" stroke-opacity="0.5"/>
-  <text x="565" y="262" font-size="13" font-weight="700" text-anchor="middle" fill="#6ee7b7">Nginx · 헬스체크</text>
+  <text x="565" y="262" font-size="13" font-weight="700" text-anchor="middle" fill="#6ee7b7">Nginx · HTTP 헬스체크</text>
 
   <rect x="479" y="286" width="172" height="52" rx="8" fill="#1e293b" stroke="#34d399" stroke-opacity="0.6"/>
   <circle cx="495" cy="303" r="4" fill="#22c55e"/>
-  <text x="507" y="308" font-size="14" font-weight="700" fill="#e2e8f0">web01</text>
-  <text x="490" y="327" font-size="12" fill="#94a3b8">Nginx · SELinux enforcing</text>
+  <text x="507" y="308" font-size="14" font-weight="700" fill="#e2e8f0">web1</text>
+  <text x="490" y="327" font-size="12" fill="#94a3b8">80번은 LB에서만 허용</text>
 
   <rect x="479" y="362" width="172" height="52" rx="8" fill="#1e293b" stroke="#34d399" stroke-opacity="0.6"/>
   <circle cx="495" cy="379" r="4" fill="#22c55e"/>
-  <text x="507" y="384" font-size="14" font-weight="700" fill="#e2e8f0">web02</text>
+  <text x="507" y="384" font-size="14" font-weight="700" fill="#e2e8f0">web2</text>
   <text x="490" y="403" font-size="12" fill="#94a3b8">1대 정지 시 자동 제외</text>
 
   <!-- ===== DB 그룹 ===== -->
@@ -69,24 +74,30 @@
 
   <rect x="729" y="286" width="172" height="52" rx="8" fill="#1e293b" stroke="#fbbf24" stroke-opacity="0.6"/>
   <circle cx="745" cy="303" r="4" fill="#22c55e"/>
-  <text x="757" y="308" font-size="14" font-weight="700" fill="#e2e8f0">pg-primary</text>
+  <text x="757" y="308" font-size="14" font-weight="700" fill="#e2e8f0">db1 · primary</text>
   <text x="740" y="327" font-size="12" fill="#94a3b8">전용 LVM 볼륨 분리</text>
 
   <line x1="815" y1="338" x2="815" y2="362" stroke="#fbbf24" stroke-width="2" marker-end="url(#arAmber)"/>
 
   <rect x="729" y="362" width="172" height="52" rx="8" fill="#1e293b" stroke="#fbbf24" stroke-opacity="0.6"/>
   <circle cx="745" cy="379" r="4" fill="#22c55e"/>
-  <text x="757" y="384" font-size="14" font-weight="700" fill="#e2e8f0">pg-replica</text>
+  <text x="757" y="384" font-size="14" font-weight="700" fill="#e2e8f0">db2 · replica</text>
   <text x="740" y="403" font-size="12" fill="#94a3b8">스트리밍 복제</text>
 
-  <!-- ===== 실측 패널 ===== -->
+  <!-- ===== 관측 그룹 ===== -->
   <rect x="965" y="230" width="195" height="200" rx="12" fill="#a78bfa" fill-opacity="0.05" stroke="#a78bfa" stroke-opacity="0.35"/>
-  <text x="981" y="264" font-size="13" fill="#c4b5fd">VIP 페일오버 다운타임</text>
-  <text x="981" y="300" font-weight="700" fill="#f1f5f9"><tspan font-size="20" fill="#c4b5fd">≈</tspan><tspan font-size="36" dx="8">1</tspan><tspan font-size="18" fill="#c4b5fd" dx="4">초</tspan></text>
-  <line x1="981" y1="318" x2="1144" y2="318" stroke="#a78bfa" stroke-opacity="0.25"/>
-  <text x="981" y="344" font-size="13" fill="#c4b5fd">웹 1대 정지 시</text>
-  <text x="981" y="374" font-size="26" font-weight="700" fill="#f1f5f9">무중단</text>
-  <text x="981" y="404" font-size="11" fill="#7c8aa3">1초 간격 curl 루프로 실측</text>
+  <rect x="979" y="242" width="167" height="30" rx="15" fill="#a78bfa" fill-opacity="0.16" stroke="#a78bfa" stroke-opacity="0.5"/>
+  <text x="1062" y="262" font-size="13" font-weight="700" text-anchor="middle" fill="#c4b5fd">mon · 관측 전용 노드</text>
+
+  <rect x="979" y="286" width="167" height="48" rx="8" fill="#1e293b" stroke="#a78bfa" stroke-opacity="0.6"/>
+  <text x="991" y="306" font-size="13" font-weight="700" fill="#e2e8f0">Prometheus</text>
+  <text x="991" y="324" font-size="11.5" fill="#94a3b8">+ Alertmanager</text>
+
+  <rect x="979" y="346" width="167" height="48" rx="8" fill="#1e293b" stroke="#a78bfa" stroke-opacity="0.6"/>
+  <text x="991" y="366" font-size="13" font-weight="700" fill="#e2e8f0">Grafana + Loki</text>
+  <text x="991" y="384" font-size="11.5" fill="#94a3b8">대시보드 · 로그 통합</text>
+
+  <text x="991" y="414" font-size="11" fill="#7c8aa3">디스크 소진 → 알림 발화 검증</text>
 
   <!-- ===== 트래픽 화살표 ===== -->
   <line x1="170" y1="350" x2="209" y2="350" stroke="#94a3b8" stroke-width="2" marker-end="url(#ar)"/>
@@ -94,9 +105,9 @@
   <line x1="665" y1="350" x2="709" y2="350" stroke="#94a3b8" stroke-width="2" marker-end="url(#ar)"/>
 
   <!-- ===== Ansible 제어 레일 ===== -->
-  <rect x="40" y="438" width="200" height="28" rx="14" fill="#1e293b" stroke="#64748b"/>
-  <text x="140" y="457" font-size="13" font-weight="700" text-anchor="middle" fill="#cbd5e1">Ansible control node ×1</text>
-  <line x1="240" y1="452" x2="1160" y2="452" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6 5"/>
+  <rect x="40" y="438" width="236" height="28" rx="14" fill="#1e293b" stroke="#64748b"/>
+  <text x="158" y="457" font-size="13" font-weight="700" text-anchor="middle" fill="#cbd5e1">Ansible control node ×1</text>
+  <line x1="276" y1="452" x2="1160" y2="452" stroke="#64748b" stroke-width="1.5" stroke-dasharray="6 5"/>
   <line x1="315" y1="452" x2="315" y2="432" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 4"/>
   <line x1="565" y1="452" x2="565" y2="432" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 4"/>
   <line x1="815" y1="452" x2="815" y2="432" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4 4"/>
@@ -105,18 +116,18 @@
   <!-- ===== 하단 배지 ===== -->
   <text x="40" y="530" font-size="14" font-weight="700" fill="#64748b">운영 정책</text>
 
-  <rect x="40" y="548" width="250" height="34" rx="8" fill="#1e293b" stroke="#334155"/>
+  <rect x="40" y="548" width="268" height="34" rx="8" fill="#1e293b" stroke="#334155"/>
   <text x="58" y="570" font-size="13" fill="#cbd5e1">SELinux enforcing 유지 (비활성화 없음)</text>
 
-  <rect x="306" y="548" width="250" height="34" rx="8" fill="#1e293b" stroke="#334155"/>
-  <text x="324" y="570" font-size="13" fill="#cbd5e1">semanage 포트 라벨링 · restorecon</text>
+  <rect x="324" y="548" width="268" height="34" rx="8" fill="#1e293b" stroke="#334155"/>
+  <text x="342" y="570" font-size="13" fill="#cbd5e1">semanage 포트 라벨링 · restorecon</text>
 
-  <rect x="572" y="548" width="250" height="34" rx="8" fill="#1e293b" stroke="#334155"/>
-  <text x="590" y="570" font-size="13" fill="#cbd5e1">ansible-vault 자격증명 암호화</text>
+  <rect x="608" y="548" width="268" height="34" rx="8" fill="#1e293b" stroke="#334155"/>
+  <text x="626" y="570" font-size="13" fill="#cbd5e1">Ansible Vault 자격증명 암호화</text>
 
-  <rect x="838" y="548" width="322" height="34" rx="8" fill="#1e293b" stroke="#334155"/>
-  <text x="856" y="570" font-size="13" fill="#cbd5e1">pg_hba 단일 IP + scram-sha-256 (최소 권한)</text>
+  <rect x="892" y="548" width="268" height="34" rx="8" fill="#1e293b" stroke="#334155"/>
+  <text x="910" y="570" font-size="13" fill="#cbd5e1">firewalld 출발지 기반 접근 제어</text>
 
-  <rect x="40" y="594" width="1120" height="34" rx="8" fill="#0b1220" stroke="#334155" stroke-dasharray="5 4"/>
-  <text x="58" y="616" font-size="13" fill="#7c8aa3">다음 단계 — 자동 백업·복구 · 모니터링(Prometheus / Grafana / Loki) · 네트워크 분리 · 통합 문서화</text>
+  <rect x="40" y="594" width="1120" height="34" rx="8" fill="#0b1220" stroke="#334155"/>
+  <text x="58" y="616" font-size="12.5" fill="#94a3b8">장애 드릴 5건 — 웹 서버 정지(무중단) · LB MASTER 정지(≈1초 페일오버) · 디스크 소진(알림 발화→자동 해제) · DROP TABLE(백업 선택 복구) · 접근 제어 적용(직접 접근 차단)</text>
 </svg>

@@ -38,6 +38,16 @@ import smartstudyImage3 from './assets/images/smartstudy_architecture.png'
 import smartstudyImage4 from './assets/images/smartstudy_erd.png'
 import smartstudyImage5 from './assets/images/smartstudy_google_login.png'
 import onpremImage from './assets/images/onprem_3tier.svg'
+import opFailover1 from './assets/images/failover-1-normal.png'
+import opFailover2 from './assets/images/failover-2-down.png'
+import opFailover3 from './assets/images/failover-3-recovered.png'
+import opHaproxyOk from './assets/images/HAProxy_stats.png'
+import opHaproxyDown from './assets/images/HAProxy_stats_web1Down.png'
+import opAlertPending from './assets/images/Prometheus_Alert_PENDING.png'
+import opAlertFiring from './assets/images/Prometheus_Alert_FIRING.png'
+import opGrafana from './assets/images/Grafana_Dashborad.png'
+import opFirewall from './assets/images/Firewall-Policy.png'
+import opChanged0 from './assets/images/Idempotent_changed0.png'
 import holdfastImage from './assets/images/holdfast_aws.svg'
 import hfHarness from './assets/images/hf-measurement-harness.svg'
 import hfOversell from './assets/images/hf-m3-oversell-by-contention.svg'
@@ -145,44 +155,81 @@ const projects = [
   {
     featured: true,
     title: "온프레미스 3-Tier 고가용성 인프라 구축",
-    period: "2026.08 ~ 진행 중 · 개인 프로젝트",
-    description: "VM 7대로 로드밸런서–웹–DB 3계층을 분리 구축하고 계층별 이중화와 장애 복구까지 직접 구성. VIP 페일오버 실측 다운타임 약 1초, 전 구성을 Ansible 롤로 코드화해 단일 명령으로 재현 가능",
-    tech: ["Rocky Linux 9", "Ansible", "HAProxy", "Keepalived", "Nginx", "PostgreSQL", "LVM", "SELinux"],
+    period: "2026.08 ~ 2026.09 · 개인 프로젝트 · 7주",
+    description: "VM 7대로 로드밸런서–웹–DB 3계층을 구축하고 계층별 이중화·복제·백업·관측·접근제어를 Ansible로 코드화. 각 계층마다 의도적으로 장애를 유발해 복구 과정을 검증했고, 전체 플레이북 재실행 시 changed=0으로 수렴하는 것을 확인해 재현 가능성을 증명",
+    tech: ["Rocky Linux 9", "Ansible", "HAProxy", "Keepalived", "Nginx", "PostgreSQL", "Prometheus", "Grafana", "Loki", "LVM", "SELinux", "firewalld"],
     image: onpremImage,
     github: "https://github.com/F3ZLoV/onprem-3tier",
     notion: "",
     details: {
-      overview: "관리형 서비스가 대신 처리해주던 계층을 직접 만들어보기 위해 Rocky Linux 9 VM 7대로 로드밸런서–웹–DB 3계층을 분리 구축한 개인 프로젝트. 계층별 이중화를 하나씩 붙이고, 구성했다고 끝내는 대신 실제로 노드를 죽여 전환과 다운타임을 측정하는 것을 원칙으로 함. 전 구성을 Ansible 롤로 코드화해 단일 명령으로 재현 가능하도록 만들었고, SELinux를 enforcing으로 유지한 상태에서 구축을 완료함. 기반 구축 · 웹 계층 · 로드밸런서 이중화 · DB 복제까지 구성을 마쳤고, 자동 백업·복구와 모니터링(Prometheus/Grafana/Loki), 네트워크 분리를 다음 단계로 확장하고 있음.",
+      overview: "관리형 서비스가 대신 처리해주던 계층을 직접 만들어보기 위해 Rocky Linux 9 VM 7대로 로드밸런서–웹–DB 3계층을 구축한 개인 프로젝트(7주). 이중화·복제·백업·관측·접근제어를 하나씩 붙이고, 구성했다고 끝내는 대신 각 계층마다 의도적으로 장애를 유발해 복구 과정을 확인하는 것을 원칙으로 함. 장애 드릴 5건 — 웹 서버 정지 / LB MASTER 정지 / 디스크 소진 / primary DROP TABLE / 접근 제어 적용 — 을 직접 일으켜 무중단 여부, 페일오버 다운타임, 알림 발화와 자동 해제, 백업 선택 복구, 차단 동작을 각각 확인함. 전 구성은 Ansible 롤 13개·플레이북 7개로 코드화했고, 전체 재실행 시 7개 노드 전부 changed=0으로 수렴하는 것을 확인해 재현 가능성을 증명함. SELinux는 enforcing을 유지한 상태로 구축을 마쳤으며, 구축 중 마주친 트러블슈팅 17건을 문서로 기록함.",
       features: [
-        "HAProxy L7(HTTP) 로드밸런싱 + HTTP 헬스체크(option httpchk)로 백엔드 자동 장애 제외 구성, 웹 서버 1대 정지 시 무중단 서비스 검증",
-        "Keepalived VRRP 기반 VIP 페일오버 구성, MASTER 노드 강제 종료 시 실측 다운타임 약 1초 확인 (1초 간격 curl 루프로 측정)",
-        "PostgreSQL 스트리밍 복제(primary/replica) 구성 및 LVM 전용 데이터 볼륨 분리로 OS 파티션과 격리",
-        "전 구성을 Ansible 롤로 코드화. host_vars 기반 역할 분기로 동일 롤에서 MASTER/BACKUP, primary/replica를 구분 배포",
-        "SELinux enforcing 유지 상태로 구축 — 비활성화 없이 포트 라벨링(semanage)과 컨텍스트 복원(restorecon)으로 정책 준수",
-        "자격증명은 ansible-vault로 암호화, pg_hba 접근 규칙을 단일 IP + scram-sha-256으로 축소 (최소 권한 적용)"
+        "HAProxy L7(HTTP) 로드밸런싱 + HTTP 헬스체크로 백엔드 자동 장애 제외. 웹 서버 1대 정지 시 무중단 서비스 검증",
+        "Keepalived VRRP 기반 VIP 페일오버 구성. MASTER 노드 강제 종료 시 1초 간격 curl 루프로 측정한 실제 다운타임 약 1초 확인",
+        "PostgreSQL 스트리밍 복제(primary/replica) 및 LVM 전용 데이터 볼륨 분리. 동일 롤에서 pg_role 변수로 역할별 task를 분기 배포",
+        "systemd timer 기반 일일 자동 백업 구축. 운영자 실수를 시뮬레이션해 DROP TABLE이 replica까지 전파되는 것을 확인하고, 백업에서 해당 테이블만 선택 복구하여 검증",
+        "Prometheus·Grafana·Alertmanager·Loki로 전 노드 메트릭·로그 통합 관측. 디스크 소진을 유발해 알림 발화부터 자동 해제까지 전 과정 검증",
+        "방화벽을 포트 개방 여부에서 출발지 기반 접근 제어로 전환. 웹 80번은 로드밸런서에서만, DB 5432는 DB 노드 상호간에만 허용. 적용 후 웹 직접 접근이 차단되고 LB 경유 서비스는 정상인 것을 확인",
+        "SELinux enforcing 유지 상태로 구축 — semanage 포트 라벨링, restorecon 컨텍스트 복원으로 정책 준수. 자격증명은 Ansible Vault 암호화",
+        "Ansible 롤 13개 · 플레이북 7개로 전 구성 코드화. 전체 재실행 시 7개 노드 전부 changed=0 확인",
+        "구축 중 마주친 트러블슈팅 17건을 증상·원인·해결 구조로 문서화 (docs/troubleshooting.md)"
       ],
       techStack: [
         "Rocky Linux 9",
-        "HAProxy (L7 · option httpchk)",
+        "HAProxy (L7 · HTTP 헬스체크)",
         "Keepalived (VRRP / VIP)",
         "Nginx",
         "PostgreSQL (스트리밍 복제)",
-        "Ansible (롤 · host_vars · vault)",
+        "Ansible (롤 13 · 플레이북 7 · Vault)",
+        "systemd timer (일일 백업)",
+        "Prometheus + Alertmanager",
+        "Grafana",
+        "Loki",
         "LVM",
-        "SELinux (semanage / restorecon)"
+        "SELinux (semanage / restorecon)",
+        "firewalld (출발지 기반 접근 제어)"
       ],
       troubleshooting: [
         {
-          problem: "PostgreSQL 복제 접속이 지속 거부됨. pg_hba.conf에 허용 규칙이 존재하고 pg_hba_file_rules 뷰에서 정상 파싱까지 확인됐으나 런타임 매칭이 되지 않음.",
-          solution: "변수를 단계적으로 배제하며 범위를 축소함. ① 인증 방식을 trust로 변경해 인증 계층을 배제, ② 주소를 0.0.0.0/0으로 확대해 범위 문제를 배제, ③ primary가 자기 자신에게 복제 접속을 시도해 네트워크·클라이언트를 배제. 세 계층이 모두 배제되어 설정 파일 자체의 문제로 특정했고, 원인은 sed 기반 반복 편집으로 파일에 누적된 비가시적 손상이었음. 부분 수정 대신 파일 전체를 재생성해 해결하고, 동일 문제 재발을 막기 위해 Ansible template 모듈로 전체 생성하는 방식으로 전환함."
+          id: "①",
+          problem: "설정이 정상인데 적용되지 않은 pg_hba.conf (2일 소요)",
+          steps: [
+            { label: "문제", text: "PostgreSQL 복제 접속이 지속 거부. 설정 파일에 허용 규칙이 존재하고 pg_hba_file_rules 뷰에서 정상 파싱까지 확인됐으나 런타임 매칭 실패." },
+            { label: "접근", text: "변수를 단계적으로 배제하며 범위 축소 — 인증 방식을 trust로 변경해 인증 계층 배제 / 주소를 0.0.0.0/0으로 확대해 범위 문제 배제 / primary가 자기 자신에게 복제 접속을 시도해 네트워크·클라이언트 배제. 세 계층이 모두 배제되어 설정 파일 자체의 문제로 특정." },
+            { label: "원인", text: "sed 기반 반복 편집으로 파일에 누적된 비가시적 손상." },
+            { label: "해결", text: "부분 수정 대신 파일 전체를 재생성. 이후 동일 문제 방지를 위해 Ansible template 모듈로 전체를 생성하는 방식으로 전환." }
+          ]
         },
         {
-          problem: "중첩 SSH 세션에서 대상 서버를 착각해 primary DB의 데이터 디렉토리를 삭제.",
-          solution: "initdb로 클러스터를 재생성한 뒤 복제 설정과 계정을 재구성함 (LVM 마운트는 유지되어 스토리지 계층 재작업은 불필요). 사후 조치에 그치지 않고 자동화 코드에 멱등성 가드를 추가함. pg_basebackup은 데이터 디렉토리를 비우는 파괴적 작업이므로, standby.signal 존재 여부를 확인해 이미 구성된 replica에서는 관련 task 전체를 skip하도록 구성.",
+          id: "②",
+          problem: "파괴적 작업으로 인한 데이터 손실과 코드 레벨 방어",
+          steps: [
+            { label: "문제", text: "중첩 SSH 세션에서 대상 서버를 착각해 primary DB의 데이터 디렉토리를 삭제." },
+            { label: "복구", text: "initdb로 클러스터 재생성 후 복제 설정·계정 재구성 (LVM 마운트는 유지되어 스토리지 계층 재작업 불필요)." },
+            { label: "개선", text: "사후 조치에 그치지 않고 자동화 코드에 멱등성 가드 추가. pg_basebackup은 데이터 디렉토리를 비우는 파괴적 작업이므로, standby.signal 존재 여부로 이미 구성된 replica에서는 관련 task 전체를 skip하도록 구성." }
+          ],
           code: "- name: Check if replica is already configured\n  ansible.builtin.stat:\n    path: \"{{ pg_data_dir }}/standby.signal\"\n  register: standby_signal\n\n# 이하 파괴적 task 전체에 다음 조건을 적용\n# when: not standby_signal.stat.exists"
+        },
+        {
+          id: "③",
+          problem: "재현 검증에서 발견한 설정 드리프트",
+          steps: [
+            { label: "문제", text: "전체 플레이북 재실행 시 changed가 계속 발생. 확인 결과 서비스 롤이 포트를 열고 방화벽 롤이 같은 포트를 닫고 있었음." },
+            { label: "영향", text: "실행 순서에 따라 최종 상태가 달라지는 불안정한 구성. 단일 플레이북만 실행할 때는 드러나지 않음." },
+            { label: "해결", text: "관심사 분리 — 서비스 롤에서 방화벽 task를 제거하고 접근 제어는 firewall 롤이 단독 관리. 수정 후 전 노드 changed=0 수렴." }
+          ],
+          rule: "하나의 자원은 하나의 주체가 관리해야 한다. 최초 구축 성공만으로 재현 가능성을 주장할 수 없으며, 전체 재실행 검증이 필요하다."
         }
       ],
-      screenshots: [onpremImage]
+      screenshots: [
+        onpremImage,
+        opFailover1, opFailover2, opFailover3,
+        opHaproxyOk, opHaproxyDown,
+        opAlertPending, opAlertFiring,
+        opGrafana,
+        opFirewall,
+        opChanged0
+      ]
     }
   },
   {
@@ -606,6 +653,27 @@ const nextScreenshot = () => {
   currentScreenshotIndex.value = (currentScreenshotIndex.value + 1) % total
 }
 
+// --- 트러블슈팅 렌더링 ---
+// steps가 있으면 그대로, 없으면 symptom/cause/action을 단계로 변환
+const tsSteps = (ts) => {
+  if (ts.steps) return ts.steps
+  if (ts.symptom) {
+    return [
+      { label: '증상', text: ts.symptom },
+      { label: '원인', text: ts.cause },
+      { label: '조치', text: ts.action }
+    ]
+  }
+  return null
+}
+
+const tsLabelClass = (label) => {
+  if (['증상', '문제'].includes(label)) return 'text-red-600 dark:text-red-400'
+  if (['원인', '영향'].includes(label)) return 'text-amber-600 dark:text-amber-400'
+  if (['접근', '조치', '해결', '복구', '개선'].includes(label)) return 'text-green-600 dark:text-green-400'
+  return 'text-muted-foreground'
+}
+
 const prevScreenshot = () => {
   if (!selectedProject.value) return
   const total = selectedProject.value.details.screenshots.length
@@ -966,30 +1034,23 @@ const prevScreenshot = () => {
                   <div class="space-y-6">
                     <div v-for="(ts, i) in selectedProject.details.troubleshooting" :key="i" class="bg-secondary/20 p-5 rounded-lg border border-border/50">
 
-                      <!-- 증상 → 원인 → 조치 → 규칙 구조 (사고 기록) -->
-                      <template v-if="ts.rule">
+                      <!-- 라벨 있는 단계 구조 (사고 기록) -->
+                      <template v-if="tsSteps(ts)">
                         <div class="flex items-baseline gap-2 mb-4 pb-3 border-b border-border/60">
                           <span v-if="ts.id" class="shrink-0 px-2 py-0.5 rounded bg-primary/10 text-primary text-xs font-bold">{{ ts.id }}</span>
                           <p class="font-bold">{{ ts.problem }}</p>
                         </div>
                         <dl class="space-y-3 text-sm">
-                          <div class="grid grid-cols-[3.5rem_1fr] gap-x-3">
-                            <dt class="text-xs font-bold text-red-600 dark:text-red-400 pt-0.5">증상</dt>
-                            <dd class="text-muted-foreground leading-relaxed">{{ ts.symptom }}</dd>
+                          <div v-for="step in tsSteps(ts)" :key="step.label" class="grid grid-cols-[3.5rem_1fr] gap-x-3">
+                            <dt class="text-xs font-bold pt-0.5" :class="tsLabelClass(step.label)">{{ step.label }}</dt>
+                            <dd class="text-muted-foreground leading-relaxed">{{ step.text }}</dd>
                           </div>
-                          <div class="grid grid-cols-[3.5rem_1fr] gap-x-3">
-                            <dt class="text-xs font-bold text-amber-600 dark:text-amber-400 pt-0.5">원인</dt>
-                            <dd class="text-muted-foreground leading-relaxed">{{ ts.cause }}</dd>
-                          </div>
-                          <div class="grid grid-cols-[3.5rem_1fr] gap-x-3">
-                            <dt class="text-xs font-bold text-green-600 dark:text-green-400 pt-0.5">조치</dt>
-                            <dd class="text-muted-foreground leading-relaxed">{{ ts.action }}</dd>
-                          </div>
-                          <div class="grid grid-cols-[3.5rem_1fr] gap-x-3 pt-2 border-t border-border/50">
-                            <dt class="text-xs font-bold text-primary pt-0.5">규칙</dt>
+                          <div v-if="ts.rule" class="grid grid-cols-[3.5rem_1fr] gap-x-3 pt-2 border-t border-border/50">
+                            <dt class="text-xs font-bold text-primary pt-0.5">{{ ts.ruleLabel || '규칙' }}</dt>
                             <dd class="font-medium leading-relaxed">{{ ts.rule }}</dd>
                           </div>
                         </dl>
+                        <pre v-if="ts.code" class="mt-4 p-3 rounded-md bg-slate-900 text-slate-100 text-xs leading-relaxed overflow-x-auto"><code>{{ ts.code }}</code></pre>
                       </template>
 
                       <!-- 기존 Problem / Solution 구조 -->
