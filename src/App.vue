@@ -171,7 +171,7 @@ const projects = [
         "Prometheus·Grafana·Alertmanager·Loki로 전 노드 메트릭·로그 통합 관측. 디스크 소진을 유발해 알림 발화부터 자동 해제까지 전 과정 검증",
         "방화벽을 포트 개방 여부에서 출발지 기반 접근 제어로 전환. 웹 80번은 로드밸런서에서만, DB 5432는 DB 노드 상호간에만 허용. 적용 후 웹 직접 접근이 차단되고 LB 경유 서비스는 정상인 것을 확인",
         "SELinux enforcing 유지 상태로 구축 — semanage 포트 라벨링, restorecon 컨텍스트 복원으로 정책 준수. 자격증명은 Ansible Vault 암호화",
-        "Ansible 롤 13개 · 플레이북 7개로 전 구성 코드화. 전체 재실행 시 7개 노드 전부 changed=0 확인",
+        "Ansible 롤 13개 · 플레이북 7개로 전 구성 코드화. 전체 재실행 시 7개 노드 전부 changed=0 확인. 이 중 db-replication은 이미 동작 중인 복제를 재구성할 위험이 있어 syntax-check·dry-run까지만 수행하고 신규 구축 재현용으로 남겨둠",
         "구축 중 마주친 트러블슈팅 17건을 증상·원인·해결 구조로 문서화 (docs/troubleshooting.md)"
       ],
       techStack: [
