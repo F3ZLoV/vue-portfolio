@@ -1,8 +1,6 @@
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
 import { useWindowScroll } from '@vueuse/core'
-import jsPDF from 'jspdf'
-import html2canvas from 'html2canvas'
 
 // --- 아이콘 import (lucide-vue-next) ---
 import {
@@ -140,7 +138,6 @@ const onIconError = (id) => {
 const isMenuOpen = ref(false)
 const activeSection = ref('home')
 const isLoading = ref(true)
-const isExporting = ref(false)
 const portfolioRef = ref(null)
 
 // 모달 상태
@@ -564,80 +561,10 @@ watch(y, (newY) => {
   }
 })
 
-const waitForImages = (element) =>
-  Promise.all(
-    Array.from(element.querySelectorAll('img')).map((img) =>
-      img.complete && img.naturalHeight !== 0
-        ? Promise.resolve()
-        : new Promise((res) => { img.onload = img.onerror = res })
-    )
-  )
-
-// --- PDF 내보내기 (새 탭 + 인쇄 창) ---
-const handleExportPdf = async () => {
-  isExporting.value = true
-  await new Promise((resolve) => setTimeout(resolve, 100))
-
-  try {
-    const pdf = new jsPDF('p', 'mm', 'a4')
-    const pdfWidth = pdf.internal.pageSize.getWidth()
-    const pdfHeight = pdf.internal.pageSize.getHeight()
-
-    const targetSections = ['home', 'about', 'projects']
-    let isFirstPage = true
-
-    for (const sectionKey of targetSections) {
-      const sectionRef = sectionRefs[sectionKey].value
-
-      let element = sectionRef?.querySelector('.a4-page')
-      if (!element && sectionKey === 'projects') {
-        element = sectionRef?.querySelector('.container')
-      }
-      if (!element) continue
-
-      await waitForImages(element)
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        imageTimeout: 15000,
-        logging: false,
-        backgroundColor: isDark.value ? '#1e293b' : '#ffffff'
-      })
-
-      const imgData = canvas.toDataURL('image/png')
-
-      // 종횡비를 보존해 폭 기준으로 배치 (예전에는 A4 전면으로 늘려 찌그러졌음)
-      const imgWidth = pdfWidth
-      const imgHeight = (canvas.height * imgWidth) / canvas.width
-
-      if (!isFirstPage) pdf.addPage()
-      isFirstPage = false
-
-      if (imgHeight <= pdfHeight + 1) {
-        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight)
-      } else {
-        // A4 한 장을 넘기는 섹션은 페이지 높이만큼 잘라 여러 장에 나눠 배치
-        let offsetY = 0
-        while (offsetY < imgHeight) {
-          pdf.addImage(imgData, 'PNG', 0, -offsetY, imgWidth, imgHeight)
-          offsetY += pdfHeight
-          if (offsetY < imgHeight) pdf.addPage()
-        }
-      }
-    }
-
-    pdf.autoPrint()
-    const blob = pdf.output('blob')
-    const url = URL.createObjectURL(blob)
-    window.open(url, '_blank')
-
-  } catch (error) {
-    console.error('PDF Error:', error)
-    alert('PDF 변환 중 오류가 발생했습니다.')
-  } finally {
-    isExporting.value = false
-  }
-}
+// --- PDF 내보내기 ---
+// 화면을 이미지로 찍던 html2canvas 방식은 글자 위치가 틀어지고 object-fit을 지원하지 않아
+// 브라우저 인쇄 엔진을 그대로 쓴다. 페이지 구성은 <style>의 @media print 참고
+const handlePrint = () => window.print()
 
 // --- 모달 관련 함수 ---
 const openModal = (project) => {
@@ -691,7 +618,7 @@ const prevScreenshot = () => {
   <div :class="{ 'dark': isDark }">
     <div ref="portfolioRef" class="min-h-screen bg-background text-foreground transition-colors duration-300">
 
-      <div class="fixed top-0 left-0 h-1 bg-primary z-50 transition-[width]" :style="{ width: scrollProgress }"></div>
+      <div class="print-hidden fixed top-0 left-0 h-1 bg-primary z-50 transition-[width]" :style="{ width: scrollProgress }"></div>
 
       <div v-if="isLoading" class="fixed inset-0 bg-background flex items-center justify-center z-50 transition-opacity duration-500">
         <Loader2 class="w-16 h-16 text-primary animate-spin" />
@@ -729,13 +656,11 @@ const prevScreenshot = () => {
             </button>
 
             <button
-                class="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90 disabled:opacity-50"
-                @click="handleExportPdf"
-                :disabled="isExporting"
+                class="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:bg-primary/90"
+                @click="handlePrint"
             >
-              <Loader2 v-if="isExporting" class="h-4 w-4 animate-spin" />
-              <FileText v-else class="h-4 w-4" />
-              {{ isExporting ? "Generating..." : "Print / Save PDF" }}
+              <FileText class="h-4 w-4" />
+              Print / Save PDF
             </button>
 
             <button class="md:hidden p-2" @click="isMenuOpen = !isMenuOpen">
@@ -913,12 +838,12 @@ const prevScreenshot = () => {
             <div class="w-20 h-1.5 bg-primary mx-auto rounded-full"></div>
           </div>
 
-          <div class="grid md:grid-cols-2 gap-8">
+          <div class="grid md:grid-cols-2 print:grid-cols-2 gap-8 print:gap-5">
             <div
                 v-for="(project, index) in projects"
                 :key="index"
                 class="group cursor-pointer"
-                :class="{ 'md:col-span-2': project.featured }"
+                :class="{ 'md:col-span-2 print:col-span-2': project.featured }"
                 @click="openModal(project)"
             >
               <div class="h-full flex flex-col bg-card border border-border/50 rounded-lg hover:shadow-lg transition-all duration-300 hover:scale-[1.02] overflow-hidden">
@@ -1124,5 +1049,34 @@ body {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+/* --- 인쇄 / PDF 저장 ---
+   홈·About은 794×1123px(= A4 @96dpi)로 그려져 있어 여백 0 페이지에 한 장씩 그대로 들어간다.
+   Projects는 길이가 가변이라 여백 있는 별도 페이지로 흘리고, 카드가 페이지 경계에서 잘리지 않게 한다. */
+@media print {
+  @page { size: A4; margin: 0; }
+  @page projects { size: A4; margin: 14mm 12mm; }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  nav, footer, #contact, .print-hidden { display: none !important; }
+
+  #home, #about { padding: 0 !important; }
+  .a4-page {
+    width: 210mm !important;
+    max-width: none !important;
+    height: 297mm !important;
+    min-height: 0 !important;
+    border-radius: 0 !important;
+    break-after: page;
+  }
+
+  #projects { page: projects; padding: 0 !important; }
+  #projects .container { max-width: none; }
+  #projects .group { break-inside: avoid; }
 }
 </style>
