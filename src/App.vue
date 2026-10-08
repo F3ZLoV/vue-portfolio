@@ -59,76 +59,84 @@ import ksciImage3 from './assets/images/fig4.png'
 import ksciImage4 from './assets/images/fig7.png'
 import ksciImage5 from './assets/images/fig8.png'
 
-import linuxIcon from './assets/icons/linux-original.png'
-import bashIcon from './assets/icons/bash-original.png'
-import nginxIcon from './assets/icons/nginx-original.png'
-import ansibleIcon from './assets/icons/ansible-original.png'
-import terraformIcon from './assets/icons/terraform-original.png'
-import prometheusIcon from './assets/icons/prometheus-original.png'
-import grafanaIcon from './assets/icons/grafana-original.png'
-import postgresIcon from './assets/icons/postgresql-original.png'
-import mysqlIcon from './assets/icons/mysql-original.png'
-import awsIcon from './assets/icons/amazonwebservices-original-wordmark.png'
-import dockerIcon from './assets/icons/docker-original.png'
-import k8sIcon from './assets/icons/kubernetes-plain.png'
-import springIcon from './assets/icons/spring-original.png'
-import pythonIcon from './assets/icons/python-original.png'
-import gitIcon from './assets/icons/git-original.png'
-
 // --- 스킬 (직접 설치·구성하고 장애를 겪어본 범위만) ---
+// id가 있으면 skillicons.dev 아이콘, 없으면(skillicons 미지원) 텍스트 칩으로 렌더링
 const skillGroups = [
   {
-    category: 'Linux & Server',
+    category: 'OS',
     items: [
-      { name: 'Rocky Linux 9 / RHEL', level: '중', icon: linuxIcon, invert: true },
-      { name: 'Shell Script', level: '중', icon: bashIcon, invert: true },
-      { name: 'SELinux · LVM', level: '초' }
+      { id: 'linux', name: 'Linux' },
+      { id: 'redhat', name: 'Red Hat' },
+      { id: 'ubuntu', name: 'Ubuntu' },
+      { id: 'bash', name: 'Bash' },
+      { name: 'Rocky Linux' },
+      { name: 'VirtualBox' },
+      { name: 'VMware' }
     ]
   },
   {
-    category: 'High Availability',
+    category: 'Web / DB',
     items: [
-      { name: 'HAProxy', level: '중' },
-      { name: 'Keepalived / VRRP', level: '초' },
-      { name: 'Nginx', level: '초', icon: nginxIcon }
+      { id: 'nginx', name: 'Nginx' },
+      { id: 'postgres', name: 'PostgreSQL' },
+      { id: 'mysql', name: 'MySQL' },
+      { name: 'HAProxy' },
+      { name: 'Keepalived' }
     ]
   },
   {
-    category: 'Automation & Monitoring',
+    category: 'Automation & Container',
     items: [
-      { name: 'Terraform', level: '초', icon: terraformIcon },
-      { name: 'Ansible', level: '초', icon: ansibleIcon, invert: true },
-      { name: 'Prometheus', level: '초', icon: prometheusIcon },
-      { name: 'Grafana', level: '초', icon: grafanaIcon }
+      { id: 'ansible', name: 'Ansible' },
+      { id: 'terraform', name: 'Terraform' },
+      { id: 'docker', name: 'Docker' },
+      { id: 'kubernetes', name: 'Kubernetes' },
+      { id: 'git', name: 'Git' },
+      { id: 'githubactions', name: 'GitHub Actions' }
     ]
   },
   {
-    category: 'Database',
+    category: 'Monitoring',
     items: [
-      { name: 'PostgreSQL 스트리밍 복제', level: '초', icon: postgresIcon },
-      { name: 'MySQL', level: '초', icon: mysqlIcon }
+      { id: 'prometheus', name: 'Prometheus' },
+      { id: 'grafana', name: 'Grafana' },
+      { name: 'Loki' }
     ]
   },
   {
-    category: 'Cloud & Container',
+    category: 'Cloud',
     items: [
-      { name: 'AWS', level: '중', icon: awsIcon },
-      { name: 'Docker', level: '중', icon: dockerIcon },
-      { name: 'Kubernetes', level: '초', icon: k8sIcon }
+      { id: 'aws', name: 'AWS' }
     ]
   },
   {
-    category: 'Development',
+    category: 'Backend',
     items: [
-      { name: 'Java / Spring Boot', level: '초', icon: springIcon },
-      { name: 'Python', level: '초', icon: pythonIcon },
-      { name: 'Git', level: '중', icon: gitIcon }
+      { id: 'nodejs', name: 'Node.js' },
+      { id: 'py', name: 'Python' },
+      { id: 'spring', name: 'Spring' }
     ]
   }
 ]
 
+// --- 자격증 ---
+const certifications = [
+  { name: '정보처리기사', issuer: '한국산업인력공단', status: '취득', date: '2026.09' },
+  { name: 'AWS SAA-C03', status: '준비 중' },
+  { name: '리눅스마스터 2급', status: '준비 중' }
+]
+
 // --- 상태 관리 ---
 const isDark = ref(false)
+
+// skillicons.dev 아이콘 — 사이트 테마에 맞춰 dark/light 전환, 로드 실패한 id는 텍스트 칩으로 대체
+// 외부 URL은 CORS 헤더가 없어 PDF(html2canvas)에 안 찍히므로, 같은 SVG를 내려받아 로컬에서 서빙
+const skillIconFiles = import.meta.glob('./assets/skillicons/*.svg', { eager: true, query: '?url', import: 'default' })
+const failedIcons = ref(new Set())
+const skillIconUrl = (id) => skillIconFiles[`./assets/skillicons/${id}-${isDark.value ? 'dark' : 'light'}.svg`]
+const onIconError = (id) => {
+  failedIcons.value = new Set(failedIcons.value).add(id)
+}
 const isMenuOpen = ref(false)
 const activeSection = ref('home')
 const isLoading = ref(true)
@@ -154,25 +162,23 @@ const navItems = ['home', 'about', 'projects', 'contact']
 const projects = [
   {
     featured: true,
-    title: "온프레미스 3-Tier 고가용성 인프라 구축",
-    period: "2026.08 ~ 2026.09 · 개인 프로젝트 · 7주",
-    description: "VM 7대로 로드밸런서–웹–DB 3계층을 구축하고 계층별 이중화·복제·백업·관측·접근제어를 Ansible로 코드화. 각 계층마다 의도적으로 장애를 유발해 복구 과정을 검증했고, 전체 플레이북 재실행 시 changed=0으로 수렴하는 것을 확인해 재현 가능성을 증명",
-    tech: ["Rocky Linux 9", "Ansible", "HAProxy", "Keepalived", "Nginx", "PostgreSQL", "Prometheus", "Grafana", "Loki", "LVM", "SELinux", "firewalld"],
+    title: "온프렘 3-Tier 고가용성 인프라",
+    period: "2026.08 ~ 2026.09 (7주) · 개인 프로젝트",
+    status: "완료",
+    description: "Rocky Linux 9 VM 7대로 LB–웹–DB 3계층을 구축하고 이중화·복제·백업·관측·접근제어를 Ansible로 코드화",
+    tech: ["Rocky Linux 9", "VirtualBox", "Ansible", "HAProxy", "Keepalived", "Nginx", "PostgreSQL", "Prometheus", "Grafana", "Alertmanager", "Loki", "firewalld", "SELinux", "LVM"],
     image: onpremImage,
     github: "https://github.com/F3ZLoV/onprem-3tier",
     notion: "",
     details: {
       overview: "관리형 서비스가 대신 처리해주던 계층을 직접 만들어보기 위해 Rocky Linux 9 VM 7대로 로드밸런서–웹–DB 3계층을 구축한 개인 프로젝트(7주). 이중화·복제·백업·관측·접근제어를 하나씩 붙이고, 구성했다고 끝내는 대신 각 계층마다 의도적으로 장애를 유발해 복구 과정을 확인하는 것을 원칙으로 함. 장애 드릴 5건 — 웹 서버 정지 / LB MASTER 정지 / 디스크 소진 / primary DROP TABLE / 접근 제어 적용 — 을 직접 일으켜 무중단 여부, 페일오버 다운타임, 알림 발화와 자동 해제, 백업 선택 복구, 차단 동작을 각각 확인함. 전 구성은 Ansible 롤 13개·플레이북 7개로 코드화했고, 전체 재실행 시 7개 노드 전부 changed=0으로 수렴하는 것을 확인해 재현 가능성을 증명함. SELinux는 enforcing을 유지한 상태로 구축을 마쳤으며, 구축 중 마주친 트러블슈팅 17건을 문서로 기록함.",
       features: [
-        "HAProxy L7(HTTP) 로드밸런싱 + HTTP 헬스체크로 백엔드 자동 장애 제외. 웹 서버 1대 정지 시 무중단 서비스 검증",
-        "Keepalived VRRP 기반 VIP 페일오버 구성. MASTER 노드 강제 종료 시 1초 간격 curl 루프로 측정한 실제 다운타임 약 1초 확인",
-        "PostgreSQL 스트리밍 복제(primary/replica) 및 LVM 전용 데이터 볼륨 분리. 동일 롤에서 pg_role 변수로 역할별 task를 분기 배포",
-        "systemd timer 기반 일일 자동 백업 구축. 운영자 실수를 시뮬레이션해 DROP TABLE이 replica까지 전파되는 것을 확인하고, 백업에서 해당 테이블만 선택 복구하여 검증",
-        "Prometheus·Grafana·Alertmanager·Loki로 전 노드 메트릭·로그 통합 관측. 디스크 소진을 유발해 알림 발화부터 자동 해제까지 전 과정 검증",
-        "방화벽을 포트 개방 여부에서 출발지 기반 접근 제어로 전환. 웹 80번은 로드밸런서에서만, DB 5432는 DB 노드 상호간에만 허용. 적용 후 웹 직접 접근이 차단되고 LB 경유 서비스는 정상인 것을 확인",
-        "SELinux enforcing 유지 상태로 구축 — semanage 포트 라벨링, restorecon 컨텍스트 복원으로 정책 준수. 자격증명은 Ansible Vault 암호화",
-        "Ansible 롤 13개 · 플레이북 7개로 전 구성 코드화. 전체 재실행 시 7개 노드 전부 changed=0 확인. 이 중 db-replication은 이미 동작 중인 복제를 재구성할 위험이 있어 syntax-check·dry-run까지만 수행하고 신규 구축 재현용으로 남겨둠",
-        "구축 중 마주친 트러블슈팅 17건을 증상·원인·해결 구조로 문서화 (docs/troubleshooting.md)"
+        "HAProxy L7(HTTP 헬스체크) + Keepalived VRRP VIP — MASTER 장애 시 실측 다운타임 약 1초",
+        "PostgreSQL WAL 스트리밍 복제 + pg_dump·systemd timer 일일 백업, DROP TABLE 후 백업 복구 검증",
+        "Ansible 롤 13개·플레이북 7개, Vault 암호화, 전체 재실행 시 changed=0 수렴(멱등성)",
+        "Prometheus·Grafana·Alertmanager·Loki 관측, 디스크 소진 알림 PENDING→FIRING→해제 확인",
+        "firewalld 출발지 제한 rich rule, SELinux enforcing 유지",
+        "장애 훈련 5종, 트러블슈팅 17건 문서화 (pg_hba 파손, VRRP 차단 split-brain 등)"
       ],
       techStack: [
         "Rocky Linux 9",
@@ -776,22 +782,31 @@ const prevScreenshot = () => {
           <div class="flex flex-col gap-6 flex-grow">
             <div>
               <h2 class="text-xl font-bold mb-2 uppercase border-l-4 border-foreground pl-3">Skills &amp; Tools</h2>
-              <div class="grid grid-cols-2 gap-x-8 gap-y-3">
-                <div v-for="group in skillGroups" :key="group.category">
-                  <h3 class="text-sm font-bold text-muted-foreground mb-2">{{ group.category }}</h3>
-                  <div class="flex flex-wrap gap-1.5">
-                    <span
-                        v-for="skill in group.items"
-                        :key="skill.name"
-                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border text-xs font-semibold text-foreground whitespace-nowrap leading-none"
-                    >
-                      <img v-if="skill.icon" :src="skill.icon" class="w-3.5 h-3.5" :class="{ 'dark:invert': skill.invert }" alt="" />
-                      <span>{{ skill.name }}</span>
+              <div class="flex flex-wrap items-center gap-x-6 gap-y-1">
+                <div
+                    v-for="group in skillGroups"
+                    :key="group.category"
+                    class="flex flex-col gap-1.5 max-w-full sm:flex-row sm:items-center sm:gap-2.5"
+                >
+                  <h3 class="text-sm font-bold text-muted-foreground whitespace-nowrap">{{ group.category }}</h3>
+                  <div class="flex flex-wrap items-center gap-x-2 gap-y-2 min-w-0">
+                    <template v-for="skill in group.items" :key="skill.name">
+                      <div v-if="skill.id && !failedIcons.has(skill.id)" class="flex flex-col items-center min-w-[3rem]">
+                        <img
+                            :src="skillIconUrl(skill.id)"
+                            :alt="skill.name"
+                            width="48"
+                            height="48"
+                            class="w-12 h-12"
+                            @error="onIconError(skill.id)"
+                        />
+                        <span class="mt-0.5 text-[10px] leading-tight text-muted-foreground whitespace-nowrap">{{ skill.name }}</span>
+                      </div>
                       <span
-                          class="font-bold"
-                          :class="skill.level === '중' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'"
-                      >({{ skill.level }})</span>
-                    </span>
+                          v-else
+                          class="px-2.5 py-1 rounded-full border border-border text-xs font-semibold text-foreground whitespace-nowrap leading-none"
+                      >{{ skill.name }}</span>
+                    </template>
                   </div>
                 </div>
               </div>
@@ -823,15 +838,20 @@ const prevScreenshot = () => {
               </div>
               <div>
                 <h2 class="text-xl font-bold mb-2 uppercase border-l-4 border-foreground pl-3">Certification</h2>
-                <div class="border-t border-border pt-2">
-                  <div class="border-b border-border pb-1.5">
-                    <div class="flex justify-between items-baseline">
-                      <span class="text-sm font-semibold text-foreground">정보처리기사</span>
-                      <span class="text-sm text-muted-foreground">2026.09</span>
+                <ul class="border-t border-border">
+                  <li
+                      v-for="cert in certifications"
+                      :key="cert.name"
+                      class="flex flex-wrap justify-between items-baseline gap-x-2 border-b border-border py-1.5"
+                  >
+                    <div>
+                      <span class="text-sm font-semibold text-foreground">{{ cert.name }}</span>
+                      <p v-if="cert.issuer" class="text-xs text-muted-foreground/70 mt-0.5">{{ cert.issuer }}</p>
                     </div>
-                    <p class="text-xs text-muted-foreground/70 mt-0.5">한국산업인력공단</p>
-                  </div>
-                </div>
+                    <span v-if="cert.date" class="text-sm text-muted-foreground whitespace-nowrap">{{ cert.status }} · {{ cert.date }}</span>
+                    <span v-else class="shrink-0 px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-xs font-semibold">{{ cert.status }}</span>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
@@ -941,7 +961,7 @@ const prevScreenshot = () => {
             <a href="mailto:fsirtru@gmail.com" class="flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-md font-medium hover:bg-primary/90 transition-colors">
               <Mail class="w-5 h-5" /> Send Email
             </a>
-            <a href="https://github.com/F3ZLoV" target="_blank" class="flex items-center gap-2 border border-input bg-background px-6 py-3 rounded-md font-medium hover:bg-accent hover:text-accent-foreground transition-colors">
+            <a href="https://github.com/F3ZLoV" target="_blank" rel="noopener" class="flex items-center gap-2 border border-input bg-background px-6 py-3 rounded-md font-medium hover:bg-accent hover:text-accent-foreground transition-colors">
               <Github class="w-5 h-5" /> Visit GitHub
             </a>
           </div>
@@ -970,11 +990,11 @@ const prevScreenshot = () => {
                   <span v-if="selectedProject.status" class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-bold">{{ selectedProject.status }}</span>
                 </div>
                 <div class="text-base flex flex-wrap gap-4 items-center mt-2 text-muted-foreground">
-                  <a v-if="selectedProject.github" :href="selectedProject.github" target="_blank" class="flex items-center gap-1 hover:text-primary transition-colors">
+                  <a v-if="selectedProject.github" :href="selectedProject.github" target="_blank" rel="noopener" class="flex items-center gap-1 hover:text-primary transition-colors">
                     <Github class="w-4 h-4" /> GitHub
                   </a>
                   <span v-if="selectedProject.github && selectedProject.notion" class="hidden md:inline">|</span>
-                  <a v-if="selectedProject.notion" :href="selectedProject.notion" target="_blank" class="flex items-center gap-1 hover:text-primary transition-colors">
+                  <a v-if="selectedProject.notion" :href="selectedProject.notion" target="_blank" rel="noopener" class="flex items-center gap-1 hover:text-primary transition-colors">
                     <img :src="notionImage" class="w-4 h-4" alt="notion" /> Notion
                   </a>
                 </div>
